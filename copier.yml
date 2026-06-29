@@ -4,7 +4,7 @@ _answers_file: .copier-answers.yml
 _tasks:
   - git init
   - uv sync
-  - pre-commit install
+  - "pre-commit install || echo 'pre-commit not found — run: pre-commit install'"
 
 # ── Questions ─────────────────────────────────────────────────────────────────
 
