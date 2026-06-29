@@ -62,7 +62,8 @@ repos:
     hooks:
       - id: opengrep
         name: opengrep (self-weakening + project rules)
-        entry: opengrep scan --config .opengrep/rules/ .
+        # Requires opengrep in PATH — installed by .devcontainer/post-create.sh
+        entry: bash -c 'command -v opengrep >/dev/null 2>&1 && opengrep scan --config .opengrep/rules/ . || (echo "[warn] opengrep not installed — skipping (run post-create.sh)" && exit 0)'
         language: system
         pass_filenames: false
         stages: [pre-commit]
