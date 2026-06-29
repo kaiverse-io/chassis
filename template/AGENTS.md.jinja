@@ -1,0 +1,61 @@
+---
+kind: agent-context
+status: active
+last_reviewed: <!-- update when reviewing -->
+---
+
+# {{ project_name }} — Agent Context
+
+> **Canonical agent context** (AGENTS.md open standard — Linux Foundation AAIF).
+> `CLAUDE.md` is a symlink to this file. Update here; the symlink follows.
+
+{{ description }}
+
+## Project structure
+
+```
+src/{{ python_package_name }}/   — application source (see import contracts in .importlinter)
+tests/                           — pytest suite
+docs/tutorials/                  — learning-oriented guides
+docs/how-to/                     — task-oriented recipes
+docs/reference/                  — API / config reference
+docs/explanation/                — concepts and theory
+docs/decisions/adrs/             — MADR decision records
+.opengrep/rules/                 — custom semantic lint rules (self-weakening + project)
+.claude/skills/                  — reusable agent skills (SKILL.md open standard)
+```
+
+## Hard rules
+
+<!-- ── PROJECT INVARIANTS SLOT ────────────────────────────────────────────── -->
+<!-- Add project-specific invariants here. Examples:                           -->
+<!--   "Nothing in core/ may import boto3 or any cloud SDK."                  -->
+<!--   "All DB writes go through the repository port, never raw psycopg3."    -->
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+
+## How to work here
+
+- `just ci` before every push — runs lint, type-check, import boundaries, tests, docs.
+- `just fmt` to auto-format (ruff format + ruff check --fix).
+- `just sync` after changing `pyproject.toml`.
+- Conventional commits enforced: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`.
+- All significant decisions → MADR ADR in `docs/decisions/adrs/` first.
+- Coverage ratchet: `fail_under` in `[tool.coverage.report]` — only ever increase it.
+
+## Agent-memory convention
+
+After a significant multi-step task, save reusable learnings to:
+`~/.claude/projects/<project-slug>/memory/`
+
+One file per insight; `MEMORY.md` index (one line per entry). This prevents knowledge
+loss across sessions and feeds the coaching loop (Factor 2/3 of 12-factor-agents).
+
+## Forbidden patterns — never do these
+
+- `git commit --no-verify` — fix the violation, never skip the gate.
+- Bare `# noqa` or `# type: ignore` without a specific code and reason.
+- Hardcode secrets — use `.env` (gitignored) and `.env.example` as the template.
+- Lower the `fail_under` coverage floor.
+- `continue-on-error: true` in CI to silence a failing step.
+- `pre-commit uninstall` — the hooks are the guardrails, not obstacles.
+- Commit to `main` without CI green.
