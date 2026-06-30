@@ -3,13 +3,13 @@
 > The chassis's coaching loop (ADR-016): anti-pattern detection + an AGENTS.md/skills auditor
 > that writes improvements back. Invoke with `/dev-coach`.
 >
-> **Related prior art:** [microsoft/ai-engineering-coach](https://github.com/microsoft/ai-engineering-coach)
-> (3.1k★, MIT) does this more comprehensively (45 anti-pattern rules, practice scores, skill
-> mining) as a VS Code dashboard extension — but it's Copilot-focused, doesn't confirm Claude
-> Code session-log support, and ships no marketplace build (build-from-source only). This skill
-> is the pragmatic now-version for Claude Code specifically: zero new infra, runs via tools
-> Claude Code already has. Revisit adopting/integrating the Microsoft tool later (bucket C/D
-> candidate) if it gains Claude Code harness support.
+> **Complements [AI Engineer Coach](https://github.com/microsoft/ai-engineering-coach)**
+> (installed by `.devcontainer/post-create.sh` — 45 anti-pattern rules, practice scores, skill
+> mining, VS Code dashboard). AEC's harness support documents GitHub Copilot; its Claude Code
+> session-log coverage is unconfirmed. This skill is Claude-Code-native: it reads this project's
+> own memory files and AGENTS.md directly via tools Claude Code already has, no dashboard needed.
+> Use both — AEC for the broader practice-score view, `/dev-coach` for closing the
+> feedback-memory-to-AGENTS.md loop specifically.
 
 ## What this skill does
 

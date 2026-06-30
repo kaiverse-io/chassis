@@ -57,11 +57,17 @@ loss across sessions and feeds the coaching loop (Factor 2/3 of 12-factor-agents
 - `just metrics` (codeburn — cost/burn by project, model, task; one-shot rate) and
   `just monitor` (abtop — live context %, tokens, rate limits) are installed by
   `.devcontainer/post-create.sh`. Both read local session data; no OTEL required.
+- **AI Engineer Coach** (VS Code dashboard, [microsoft/ai-engineering-coach](https://github.com/microsoft/ai-engineering-coach))
+  is built from source and installed by `.devcontainer/post-create.sh` — 45 anti-pattern
+  rules, practice scores, skill mining. Open via Cmd/Ctrl+Shift+P → "AI Engineer Coach:
+  Open Dashboard". **Claude Code session-log support is unconfirmed** (the project documents
+  GitHub Copilot harnesses) — verify what it actually surfaces for this project.
 - OTEL telemetry is on and exports to console locally (`.claude/settings.json`) — the
   spine for a future OTLP collector + team dashboard (bucket D, activates at users > 1).
-- `/dev-coach` — anti-pattern detection + AGENTS.md auditor. Run periodically to close the
-  loop between "the user corrected something" and "the rule is durable in AGENTS.md."
-  See `.agents/skills/dev-coach/SKILL.md`.
+- `/dev-coach` — anti-pattern detection + AGENTS.md auditor, specifically for Claude Code
+  session/memory data (complements AI Engineer Coach, doesn't replace it). Run periodically
+  to close the loop between "the user corrected something" and "the rule is durable in
+  AGENTS.md." See `.agents/skills/dev-coach/SKILL.md`.
 
 ## Forbidden patterns — never do these
 

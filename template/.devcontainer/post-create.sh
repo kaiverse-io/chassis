@@ -66,6 +66,33 @@ if ! command -v abtop >/dev/null 2>&1; then
     || echo "[warn] abtop install failed — install manually: cargo install abtop"
 fi
 
+# ── AI Engineer Coach (VS Code dashboard — anti-patterns, practice score) ─────
+# https://github.com/microsoft/ai-engineering-coach (3.1k★, MIT). No marketplace build —
+# build from source. Harness support documents GitHub Copilot; Claude Code session-log
+# support is unconfirmed — verify after install. User-authorized unattended build
+# (2026-06-30) despite running this repo's own npm lifecycle/build scripts.
+if command -v code >/dev/null 2>&1 \
+   && ! code --list-extensions 2>/dev/null | grep -qi "ai-engineer-coach"; then
+  echo "→ Building AI Engineer Coach (clone + npm ci + package — this takes a minute) …"
+  AEC_DIR="$HOME/.local/share/ai-engineering-coach"
+  if [ ! -d "$AEC_DIR" ]; then
+    git clone --depth 1 https://github.com/microsoft/ai-engineering-coach.git "$AEC_DIR" 2>/dev/null
+  fi
+  if [ -d "$AEC_DIR" ]; then
+    (
+      cd "$AEC_DIR"
+      npm ci --silent && npm run package --silent
+      VSIX=$(find . -maxdepth 1 -name "*.vsix" | head -n1)
+      if [ -n "$VSIX" ]; then
+        code --install-extension "$VSIX"
+        echo "✓ AI Engineer Coach installed — open via Cmd/Ctrl+Shift+P → 'AI Engineer Coach: Open Dashboard'"
+      else
+        echo "[warn] AI Engineer Coach build produced no .vsix — install manually, see https://github.com/microsoft/ai-engineering-coach"
+      fi
+    ) || echo "[warn] AI Engineer Coach build failed — install manually, see https://github.com/microsoft/ai-engineering-coach"
+  fi
+fi
+
 # ── Project setup ─────────────────────────────────────────────────────────────
 if [ -f pyproject.toml ]; then
   echo "→ uv sync …"

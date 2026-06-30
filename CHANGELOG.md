@@ -6,6 +6,32 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.3.0] — 2026-06-30
+
+### Added
+
+- OTEL console exporters (`OTEL_METRICS_EXPORTER`/`OTEL_LOGS_EXPORTER=console`) in
+  `.claude/settings.json` — telemetry was enabled but had no exporter, so it was
+  captured and silently dropped. Foundation for the future OTLP collector (bucket D).
+- `codeburn` (npm) and `abtop` (curl installer) auto-installed by
+  `.devcontainer/post-create.sh` — local-first AI-usage cockpit (cost/burn, one-shot
+  rate, live context %), no OTEL required. `just metrics` / `just monitor` targets.
+- [AI Engineer Coach](https://github.com/microsoft/ai-engineering-coach) (VS Code
+  dashboard, 45 anti-pattern rules) built from source and auto-installed by
+  `.devcontainer/post-create.sh`. Claude Code session-log support unconfirmed —
+  documented as a caveat in AGENTS.md.
+- `.agents/skills/dev-coach/SKILL.md` — anti-pattern detection + AGENTS.md auditor
+  for Claude Code specifically (reads feedback-type memory files + git history,
+  proposes AGENTS.md additions, asks before writing). Complements AI Engineer Coach.
+
+### Note
+
+The codeburn/abtop/AI-Engineer-Coach installs are unattended and run on every
+devcontainer rebuild across every project stamped from this chassis — user-authorized
+explicitly given that blast radius (2026-06-30).
+
+---
+
 ## [0.2.0] — 2026-06-30
 
 ### Added
