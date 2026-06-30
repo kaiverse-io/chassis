@@ -47,6 +47,25 @@ if ! command -v opengrep >/dev/null 2>&1; then
     || echo "[warn] opengrep pip install failed — install manually from https://github.com/opengrep/opengrep"
 fi
 
+# ── codeburn (AI usage cost/burn cockpit — bucket C) ──────────────────────────
+# Local-first: reads Claude Code's own session JSONL, no OTEL required.
+# User-authorized auto-install (2026-06-30) — see chassis CHANGELOG.
+if ! command -v codeburn >/dev/null 2>&1; then
+  echo "→ Installing codeburn …"
+  npm install -g codeburn --silent 2>/dev/null \
+    || echo "[warn] codeburn install failed (needs npm) — install manually: npm install -g codeburn"
+fi
+
+# ── abtop (live session monitor — bucket C) ───────────────────────────────────
+# User-authorized auto-install (2026-06-30) — see chassis CHANGELOG.
+if ! command -v abtop >/dev/null 2>&1; then
+  echo "→ Installing abtop …"
+  curl --proto '=https' --tlsv1.2 -LsSf \
+    https://github.com/graykode/abtop/releases/latest/download/abtop-installer.sh \
+    2>/dev/null | sh 2>/dev/null \
+    || echo "[warn] abtop install failed — install manually: cargo install abtop"
+fi
+
 # ── Project setup ─────────────────────────────────────────────────────────────
 if [ -f pyproject.toml ]; then
   echo "→ uv sync …"
