@@ -16,12 +16,14 @@ last_reviewed: <!-- update when reviewing -->
 ```
 src/{{ python_package_name }}/   — application source (see import contracts in .importlinter)
 tests/                           — pytest suite
+prompts/                         — versioned prompt artifacts (never inline — see prompts/README.md)
+evals/                           — eval harness slot (wired-but-waiting; see evals/README.md)
 docs/tutorials/                  — learning-oriented guides
 docs/how-to/                     — task-oriented recipes
 docs/reference/                  — API / config reference
 docs/explanation/                — concepts and theory
 docs/decisions/adrs/             — MADR decision records
-.opengrep/rules/                 — custom semantic lint rules (self-weakening + project)
+.opengrep/rules/                 — custom semantic lint rules (self-weakening + prompts-as-code + project)
 .agents/skills/                  — reusable agent skills (SKILL.md open standard; .claude/skills/ symlinks here)
 ```
 
@@ -53,6 +55,7 @@ loss across sessions and feeds the coaching loop (Factor 2/3 of 12-factor-agents
 ## Forbidden patterns — never do these
 
 - `git commit --no-verify` — fix the violation, never skip the gate.
+- Inline prompt literals (200+ chars) — move to `prompts/` and load at runtime.
 - Bare `# noqa` or `# type: ignore` without a specific code and reason.
 - Hardcode secrets — use `.env` (gitignored) and `.env.example` as the template.
 - Lower the `fail_under` coverage floor.
