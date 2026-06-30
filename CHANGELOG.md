@@ -6,6 +6,21 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.4.0] — 2026-06-30
+
+### Added
+
+- **Agent-memory durability.** `.agents/memory/` is now a git-tracked location, and
+  `.devcontainer/post-create.sh` recreates the conventional `~/.claude/projects/<slug>/memory`
+  path as a symlink to it on every build (mirrors `.claude/skills → .agents/skills`). The
+  `~/.claude` bind mount only persists on *local* devcontainers — on remote/cloud containers
+  `.claude` is ephemeral, so agent memory was silently lost on rebuild. Committing
+  `.agents/memory/` now makes memory durable across rebuilds and portable to a fresh clone.
+  Seed `.agents/memory/MEMORY.md` ships so the dir exists in fresh stamps; AGENTS.md documents
+  the convention.
+
+---
+
 ## [0.3.0] — 2026-06-30
 
 ### Added
