@@ -28,10 +28,10 @@ just accept    # stamp a throwaway project → just ci green
 
 | Bucket | Contents |
 |---|---|
-| **A — Guardrails** | AGENTS.md, ruff+mypy, import-linter slot, opengrep self-weakening, gitleaks, conventional commits, CODEOWNERS, Diátaxis docs |
+| **A — Guardrails** | AGENTS.md, `.agents/skills/`, devcontainer (4-layer), ruff+mypy, import-linter slot, opengrep self-weakening + prompts-as-code, gitleaks, conventional commits, CODEOWNERS, Diátaxis docs, `prompts/` convention |
 | **B — Ratcheting** | Coverage floor, complexity ceiling |
 | **C — On-demand** | codeburn AI metrics |
-| **D — Wired-waiting** | Eval gate slot, ADLC gate slot, arch-drift slot |
+| **D — Wired-waiting** | `evals/` (eval gate, activates P1), `.github/workflows/adlc-gate.yaml` (no-op until `evals/golden/` has fixtures), arch-drift slot |
 
 ## Versioning
 
