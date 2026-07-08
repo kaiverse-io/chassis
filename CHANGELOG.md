@@ -6,6 +6,21 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.6.3] — 2026-07-08
+
+### Added
+
+- `SessionStart` hook (`.claude/hooks/session-start-cockpit.sh`): refreshes `graphify`'s graph
+  and `ctx`'s session index at the start of every session, and injects a short reminder of the
+  cockpit's existence directly into the agent's context (confirmed: `SessionStart` stdout is
+  added to context automatically, before the first prompt, and cannot block the session — so
+  this is genuinely free of downside, only upside). This is the mechanism that makes the cockpit
+  a first-class, hardcoded default rather than "documented, easily forgotten" — which is
+  precisely what happened earlier in the same session that produced this fix: `graphify` sat
+  installed and unused for the entire session until asked about directly.
+
+---
+
 ## [0.6.2] — 2026-07-08
 
 ### Added

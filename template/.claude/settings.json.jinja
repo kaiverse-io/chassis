@@ -17,5 +17,17 @@
       "Bash(git commit *)",
       "Bash(pre-commit run *)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session-start-cockpit.sh"
+          }
+        ]
+      }
+    ]
   }
 }
