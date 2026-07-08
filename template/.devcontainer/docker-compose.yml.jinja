@@ -11,6 +11,15 @@ services:
       - precommit-cache:/home/vscode/.cache/pre-commit{% if include_ts %}
       - pnpm-cache:/home/vscode/.local/share/pnpm/store{% endif %}
 
+      # Claude Code session transcripts — a real Docker volume, not just the
+      # devcontainer.json ~/.claude bind mount. That bind mount only persists
+      # when ${localEnv:HOME} is itself a durable host path (true on local
+      # devcontainers, not guaranteed on remote/cloud ones). Nesting a named
+      # volume at .claude/projects specifically guarantees session history
+      # survives a rebuild either way — Docker layers the more specific mount
+      # inside the parent bind mount.
+      - claude-projects:/home/vscode/.claude/projects
+
     environment:
       UV_LINK_MODE: copy   # volumes are on different filesystems in Docker
 
@@ -30,3 +39,5 @@ volumes:
   uv-cache:
   precommit-cache:{% if include_ts %}
   pnpm-cache:{% endif %}
+
+  claude-projects:

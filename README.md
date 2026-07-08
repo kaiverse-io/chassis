@@ -8,8 +8,11 @@ from commit 1. See [AGENTS.md](AGENTS.md) for the agent context.
 ## Stamp a new project
 
 ```bash
-copier copy gh:km2411/chassis path/to/new-project
+copier copy gh:km2411/chassis path/to/new-project --trust
 ```
+
+`--trust` is required by copier 9.x to run this template's `_tasks` (`git init`, `uv sync`,
+`pre-commit install`). Only pass `--trust` for templates you actually trust — this one included.
 
 ## Update a stamped project
 
