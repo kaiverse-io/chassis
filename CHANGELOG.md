@@ -6,6 +6,35 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.6.0] — 2026-07-08
+
+### Added
+
+- `claude-projects` named Docker volume in `docker-compose.yml.jinja`, nested inside the
+  devcontainer.json `~/.claude` bind mount at `.claude/projects`. That bind mount only persists
+  when `${localEnv:HOME}` is itself a durable host path (true on local devcontainers, not
+  guaranteed on remote/cloud ones) — the nested volume guarantees Claude Code session
+  transcripts survive a rebuild either way.
+
+### Fixed
+
+- `ci-lint`'s justfile recipe had a bad indentation-sensitive `python3 -c` block since the
+  initial commit (`56cbad2`) — `just` was silently never able to run it. Converted to a shebang
+  recipe, matching the pattern `accept` already used correctly.
+- `just accept` never actually completed: copier 9.x refuses templates with `_tasks` (`git
+  init`/`uv sync`/`pre-commit install`) without `--trust`. Added it to `accept` and to the
+  README's stamp instructions.
+
+### Note
+
+**Copier resolves the latest semver tag by default, not branch HEAD**, for a git-based template
+source — confirmed by testing (a canary commit on `main` was invisible to `copier copy`/`update`
+until a new tag was cut). This means every chassis change that should actually reach stamped
+projects needs a version tag, not just a commit to `main` — the fixes above sat unreachable on
+`main` between `v0.5.0` and this tag despite being pushed.
+
+---
+
 ## [0.5.0] — 2026-07-08
 
 ### Added
