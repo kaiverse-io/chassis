@@ -42,6 +42,22 @@ The others are legitimate on their own: `abtop` is just a live dashboard, `graph
 the agent faster at understanding code, `AI Engineer Coach` is a second, independent lens. None
 of them are required for any other tool to work — that's deliberate (see "Quality controls").
 
+### lean-ctx's MCP tools need a session restart to appear
+
+`lean-ctx onboard` registers `lean-ctx` as an MCP server and writes a block into the assistant's
+instruction file telling it to prefer `ctx_read`/`ctx_shell`/`ctx_search`/`ctx_patch` over native
+tools when they're available. Installing it mid-session does not make those tools available in
+that same session — MCP servers are loaded at session start, and registering one doesn't
+retroactively inject its tools into an already-running conversation. The instruction block
+accounts for this explicitly ("if no `ctx_*` tools are listed in this session, use the native
+tools throughout"), so an assistant using native tools right after a fresh `lean-ctx onboard` is
+behaving correctly, not failing to pick it up — the fix is simply to start a new session.
+
+Neither `ctx`'s session-history index nor `lean-ctx`'s cache/stats currently survive a
+devcontainer rebuild — see
+[docs/explanation/devcontainer-persistence.md](devcontainer-persistence.md) for why, and what
+fixing it would look like.
+
 ## The loop, concretely
 
 1. You work with an agent. It makes a mistake, or you correct it, or it re-reads the same file

@@ -6,6 +6,24 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.6.1] — 2026-07-08
+
+### Added
+
+- `docs/explanation/devcontainer-persistence.md` — the full persistence model (git-tracked
+  files, Docker named volumes, host bind mounts), what survives a rebuild and what doesn't, and
+  the migration gotcha when nesting a new volume inside an existing bind mount (as `v0.6.0`'s
+  `claude-projects` volume does).
+- `docs/how-to/release-a-chassis-version.md` — copier resolves the latest git tag, not branch
+  HEAD, so a commit alone never reaches consumers. This is the release checklist that makes
+  that fact actionable instead of a war story.
+- `ai-usage-cockpit.md`: documented that `lean-ctx`'s MCP tools need a session restart to
+  appear after `lean-ctx onboard` — registering an MCP server mid-session doesn't inject its
+  tools into an already-running conversation.
+- README: docs index section, `--trust` noted on `copier update` (not just `copy`).
+
+---
+
 ## [0.6.0] — 2026-07-08
 
 ### Added

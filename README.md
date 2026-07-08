@@ -18,8 +18,13 @@ copier copy gh:km2411/chassis path/to/new-project --trust
 
 ```bash
 cd path/to/stamped-project
-copier update
+copier update --trust
 ```
+
+Note: `copier update`/`copier copy` resolve the **latest git tag**, not `main`'s HEAD — a commit
+that isn't tagged yet won't show up. See
+[docs/how-to/release-a-chassis-version.md](docs/how-to/release-a-chassis-version.md) if you're
+the one shipping the chassis change, not just consuming it.
 
 ## Acceptance test
 
@@ -39,3 +44,17 @@ just accept    # stamp a throwaway project → just ci green
 ## Versioning
 
 SemVer tags + CHANGELOG.md. `copier update` in a stamped project pulls improvements.
+See [docs/how-to/release-a-chassis-version.md](docs/how-to/release-a-chassis-version.md).
+
+## Docs
+
+- [AI-usage cockpit](docs/explanation/ai-usage-cockpit.md) — what the six bucket-C tools do, how
+  they close the loop back into `AGENTS.md`, and how to add a seventh.
+- [Devcontainer persistence](docs/explanation/devcontainer-persistence.md) — what survives a
+  rebuild (git, named volumes) vs. what doesn't (the container's own filesystem), and the
+  migration gotcha when adding a new volume over existing bind-mounted data.
+- [Why a Copier chassis?](docs/explanation/chassis-design.md) — the A/B/C/D bucket model and the
+  thin-chassis discipline.
+- [How to release a chassis version](docs/how-to/release-a-chassis-version.md) — the tag is the
+  release, not the commit.
+- [ADR log](docs/decisions/adrs/) — MADR decision records.
