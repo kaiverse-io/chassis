@@ -6,6 +6,35 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.7.0] — 2026-07-08
+
+### Added
+
+- Chassis now has its **own standalone devcontainer** at the repo root — `git clone` chassis
+  alone, no sibling project needed, "Reopen in Container" just works. Previously chassis could
+  only be developed by piggybacking inside another project's devcontainer that happened to mount
+  it as a sibling folder.
+- `.devcontainer/post-create.sh`, `.claude/settings.json`, `.claude/hooks/session-start-cockpit.sh`,
+  and `.agents/skills/dev-coach/SKILL.md` at the repo root are **symlinks** into `template/` —
+  the literal same file a stamped project gets, not a hand-maintained copy. A bugfix to any of
+  these fixes chassis's own devcontainer and every future stamped project at once.
+- `.devcontainer/devcontainer.json`/`docker-compose.yml` are deliberately independent, not
+  symlinked or generated from the template: they mount just chassis's own root
+  (`..:/workspaces/chassis`), not the template's sibling-project convention
+  (`../..:/workspaces`, which assumes a shared parent folder with other projects — appropriate
+  for a stamped project developed alongside chassis, wrong for a standalone chassis clone which
+  has no sibling to see and shouldn't be exposed to whatever else happens to live nearby).
+- `AGENTS.md`'s cockpit/token-frugality section is now a proven, checked invariant, not just a
+  hand-copied one-time bootstrap: both `AGENTS.md` and `template/AGENTS.md.jinja` mark the shared
+  span with `<!-- cockpit-section:start/end -->`, and `ci-lint` fails if they diverge. This
+  exists because the drift already happened for real once this session — `AGENTS.md.jinja` sat
+  three tools behind for most of it before anyone noticed.
+- `.agents/memory/MEMORY.md` seed at the repo root — chassis's own real, accumulated memory,
+  independent of the template's seed by design (meant to diverge immediately, like any stamped
+  project's does).
+
+---
+
 ## [0.6.3] — 2026-07-08
 
 ### Added

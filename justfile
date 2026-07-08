@@ -36,7 +36,7 @@ ci: ci-lint
 
 ci-lint:
     #!/usr/bin/env python3
-    import pathlib, sys
+    import pathlib, re, sys
     print("Chassis lint: checking YAML/JINJA files are well-formed …")
     errors = []
     for f in pathlib.Path("template").rglob("*.jinja"):
@@ -48,6 +48,38 @@ ci-lint:
         print("\n".join(errors), file=sys.stderr)
         sys.exit(1)
     print(f"All {len(list(pathlib.Path('template').rglob('*.jinja')))} jinja templates readable.")
+
+    print("Chassis lint: checking AGENTS.md cockpit section matches template/AGENTS.md.jinja …")
+
+    def extract(path):
+        text = pathlib.Path(path).read_text()
+        m = re.search(
+            r"<!-- cockpit-section:start.*?-->\n(.*)<!-- cockpit-section:end -->",
+            text,
+            re.DOTALL,
+        )
+        if not m:
+            return None
+        return m.group(1)
+
+    own = extract("AGENTS.md")
+    template = extract("template/AGENTS.md.jinja")
+    if own is None or template is None:
+        print(
+            "AGENTS.md and template/AGENTS.md.jinja must both have a "
+            "<!-- cockpit-section:start/end --> block.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    if own != template:
+        print(
+            "AGENTS.md's cockpit section has drifted from template/AGENTS.md.jinja's — "
+            "these are meant to be identical (see AGENTS.md 'Hard rules'). Update whichever "
+            "one is stale so both match, then rerun.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    print("Cockpit sections match.")
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 

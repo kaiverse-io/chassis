@@ -1,0 +1,1 @@
+../../template/.claude/hooks/session-start-cockpit.sh

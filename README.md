@@ -70,6 +70,16 @@ copier copy gh:km2411/chassis path/to/new-project --trust
 Open the result in a devcontainer (VS Code will offer to) and you have a working, linted,
 tested, guardrailed project before writing a line of your own code.
 
+## Working on chassis itself
+
+Chassis has its own standalone devcontainer — `git clone` this repo alone (no sibling project
+needed) and "Reopen in Container." Its own `.devcontainer/post-create.sh`, `.claude/settings.json`
+and hooks, and `.agents/skills/dev-coach/SKILL.md` are **symlinks** into `template/` (the exact
+same file a stamped project gets), so chassis dogfoods the identical cockpit it ships, with zero
+drift possible between the two. Only `devcontainer.json`/`docker-compose.yml` (need a standalone,
+non-sibling volume mount) and `.agents/memory/` (chassis's own real, accumulated memory) are
+independent by design. Full reasoning in `AGENTS.md`.
+
 ## Update a stamped project
 
 ```bash

@@ -1,0 +1,24 @@
+# Standalone dev environment for chassis itself — not a stamped project's devcontainer
+# (that's template/.devcontainer/*.jinja). This lets someone clone km2411/chassis on its
+# own and get a working "Reopen in Container" experience without needing a sibling
+# project to piggyback inside, which is how chassis was actually developed before this
+# file existed.
+services:
+  app:
+    image: mcr.microsoft.com/devcontainers/python:1-3.12-bookworm
+    command: sleep infinity
+    volumes:
+      - ..:/workspaces/chassis:cached
+      - uv-cache:/home/vscode/.cache/uv
+      - precommit-cache:/home/vscode/.cache/pre-commit
+      # Claude Code session transcripts — see docs/explanation/devcontainer-persistence.md
+      # for why this is a named volume nested inside the ~/.claude bind mount, not just
+      # the bind mount alone.
+      - claude-projects:/home/vscode/.claude/projects
+    environment:
+      UV_LINK_MODE: copy
+
+volumes:
+  uv-cache:
+  precommit-cache:
+  claude-projects:

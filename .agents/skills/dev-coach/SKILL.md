@@ -1,0 +1,1 @@
+../../../template/.agents/skills/dev-coach/SKILL.md
