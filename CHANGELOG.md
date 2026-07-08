@@ -6,6 +6,41 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.6.2] — 2026-07-08
+
+### Added
+
+- `docs/explanation/layered-model.md` — ten capability layers grouped into Foundation
+  (Substrate, Governance, Guardrails, Prompts, Ratchet), Cockpit (Memory, Context Engineering,
+  Tools/Skills, Coaching), and Readiness, with a Mermaid diagram. Names and grounds distinctions
+  that were previously implicit across several docs: Memory (curated, deliberate) vs. Context
+  Engineering (automatic, exhaustive) vs. Governance (constrains agent *actions*) vs. Guardrails
+  (constrains *code* quality) vs. determinism (the unifying purpose of the whole Foundation
+  group — wrapping non-deterministic agent output in checks that don't care who wrote it).
+  Maps onto 12-factor-agents: only F2 (Own your Prompts) and F3 (Own your Context Window) are
+  chassis's job, because they're the only two factors describing *any* agent's behavior rather
+  than a specific shipped product's architecture.
+- `docs/explanation/two-plane-model.md` — the Plane-1 (how the software gets built, chassis's
+  entire job) / Plane-2 (what the shipped product does, deliberately not chassis's job)
+  distinction, previously only implicit across several docs, now explained on its own with a
+  concrete example.
+- `AGENTS.md.jinja`: brought the stamped project's cockpit section to parity with the actual six
+  tools (was only listing three), and added a **Token frugality — tool preference** section —
+  vendor-agnostic (conditional on whatever MCP tools are actually listed in a given agent's
+  session, not Claude-specific), covering the `ctx_*` tool-preference table, read modes, and
+  edit-failure handling.
+
+### Changed
+
+- README rewritten for a reader with zero prior context: leads with the problem chassis solves
+  (guardrails from commit 1, compounding via `copier update` instead of a one-time template
+  copy), explains *why* each A/B/C/D bucket exists rather than just listing contents, highlights
+  the AI-usage cockpit specifically, adds a directory sketch of what a stamped project looks
+  like, and a Quick Start with prerequisites. Previously assumed the reader already knew what
+  chassis was for.
+
+---
+
 ## [0.6.1] — 2026-07-08
 
 ### Added
