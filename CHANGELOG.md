@@ -6,6 +6,30 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.5.0] — 2026-07-08
+
+### Added
+
+- `graphify` (uv tool, knowledge-graph skill), `ctx` (cross-session agent-history search), and
+  `lean-ctx` (context-compression MCP layer) added to the bucket-C AI-usage cockpit in
+  `.devcontainer/post-create.sh`, alongside `codeburn`/`abtop`/AI Engineer Coach. See
+  [ADR-002](docs/decisions/adrs/adr-002-ai-usage-cockpit.md) for why these three, the
+  install-method lessons (no Rust toolchain needed for either Rust tool), and the tradeoffs
+  (`lean-ctx onboard` touches machine-wide config, not just the project).
+- `/dev-coach` steps 2a/3a: when `ctx`/`lean-ctx` are present, search full session transcripts
+  for repeated corrections (`ctx search`) and check repeat-read hotspots (`lean-ctx
+  gain`/`heatmap`) as additional signal beyond memory files and `git log`. Optional, not
+  required — the skill degrades gracefully without them, same as it always has for `codeburn`.
+
+### Note
+
+All three installs are unattended and run on every devcontainer rebuild across every project
+stamped from this chassis, same blast-radius profile as the v0.3.0 cockpit tools — user-
+authorized explicitly given that (2026-07-08), after each tool was installed and inspected by
+hand in a live devcontainer first (not templated from documentation alone).
+
+---
+
 ## [0.4.0] — 2026-06-30
 
 ### Added

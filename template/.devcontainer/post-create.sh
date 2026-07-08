@@ -93,6 +93,50 @@ if command -v code >/dev/null 2>&1 \
   fi
 fi
 
+# ── graphify (AI-powered knowledge graph — bucket C) ──────────────────────────
+# https://github.com/Graphify-Labs/graphify. Local-first tree-sitter parsing + assistant-
+# driven semantic extraction into graph.json/graph.html/GRAPH_REPORT.md. Installs as a uv
+# tool + multi-assistant skill (`/graphify` in Claude Code and 15+ other assistants).
+# User-authorized auto-install (2026-07-08) — see chassis CHANGELOG.
+if command -v uv >/dev/null 2>&1 && ! command -v graphify >/dev/null 2>&1; then
+  echo "→ Installing graphify …"
+  uv tool install graphifyy --quiet 2>/dev/null \
+    && graphify install >/dev/null 2>&1 \
+    || echo "[warn] graphify install failed — install manually: uv tool install graphifyy && graphify install"
+fi
+
+# ── ctx (cross-session agent history search — bucket C) ───────────────────────
+# https://github.com/ctxrs/ctx. Indexes local coding-agent session history into SQLite;
+# `ctx search "…"` retrieves prior decisions/failed attempts across sessions instead of
+# repeating work. Official installer fetches a prebuilt binary — no Rust toolchain needed
+# (building from source requires rust-version 1.81+, heavier than this slot warrants).
+# User-authorized auto-install (2026-07-08) — see chassis CHANGELOG.
+if ! command -v ctx >/dev/null 2>&1; then
+  echo "→ Installing ctx …"
+  curl --proto '=https' --tlsv1.2 -fsSL https://ctx.rs/install | sh 2>/dev/null \
+    || echo "[warn] ctx install failed — install manually: curl -fsSL https://ctx.rs/install | sh"
+fi
+if command -v ctx >/dev/null 2>&1; then
+  ctx setup >/dev/null 2>&1 || true
+fi
+
+# ── lean-ctx (context-compression MCP layer — bucket C) ───────────────────────
+# https://github.com/yvgude/lean-ctx. Gates what the agent reads, caches re-reads, and
+# compresses shell/tool output — 60-90% token savings, receipts via `lean-ctx gain`. More
+# invasive than the other cockpit tools: it sits between the agent and its context, not
+# just observing it. Installed via its npm-packaged prebuilt binary — building the Rust
+# source directly needs edition-2024 (rustc 1.85+) and OOM'd a 8GB devcontainer via its
+# LTO release profile, so npm is both simpler and more reliable here.
+# User-authorized auto-install (2026-07-08) — see chassis CHANGELOG.
+if ! command -v lean-ctx >/dev/null 2>&1; then
+  echo "→ Installing lean-ctx …"
+  npm install -g lean-ctx-bin --silent 2>/dev/null \
+    || echo "[warn] lean-ctx install failed — install manually: npm install -g lean-ctx-bin"
+fi
+if command -v lean-ctx >/dev/null 2>&1; then
+  lean-ctx onboard >/dev/null 2>&1 || true
+fi
+
 # ── Agent memory durability ───────────────────────────────────────────────────
 # Canonical memory is git-tracked in-repo (.agents/memory). The conventional Claude
 # path lives on the ephemeral home overlay (the ~/.claude bind mount only persists on

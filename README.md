@@ -30,7 +30,7 @@ just accept    # stamp a throwaway project → just ci green
 |---|---|
 | **A — Guardrails** | AGENTS.md, `.agents/skills/`, devcontainer (4-layer), ruff+mypy, import-linter slot, opengrep self-weakening + prompts-as-code, gitleaks, conventional commits, CODEOWNERS, Diátaxis docs, `prompts/` convention |
 | **B — Ratcheting** | Coverage floor, complexity ceiling |
-| **C — On-demand** | codeburn AI metrics |
+| **C — On-demand** | [AI-usage cockpit](docs/explanation/ai-usage-cockpit.md): codeburn, abtop, AI Engineer Coach, graphify, ctx, lean-ctx |
 | **D — Wired-waiting** | `evals/` (eval gate, activates P1), `.github/workflows/adlc-gate.yaml` (no-op until `evals/golden/` has fixtures), arch-drift slot |
 
 ## Versioning

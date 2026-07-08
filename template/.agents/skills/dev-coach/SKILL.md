@@ -10,6 +10,9 @@
 > own memory files and AGENTS.md directly via tools Claude Code already has, no dashboard needed.
 > Use both — AEC for the broader practice-score view, `/dev-coach` for closing the
 > feedback-memory-to-AGENTS.md loop specifically.
+>
+> **Also draws on `ctx` and `lean-ctx`** (same `post-create.sh` bucket-C cockpit) where present —
+> see steps 2a/3a. Neither is required; both sharpen the signal beyond memory files and git log.
 
 ## What this skill does
 
@@ -25,17 +28,31 @@ skills — then asks before writing anything. It never edits silently.
 
 2. **Scan recent memory for unreflected feedback.** Read every file under
    `~/.claude/projects/<project-slug>/memory/` with `metadata.type: feedback` (check
-   `MEMORY.md` for the index — `<project-slug>` is the dashed form of the repo path, e.g.
-   `-workspaces-example_project`). For each one, check whether its rule already appears in `AGENTS.md`
+   `MEMORY.md` for the index — `<project-slug>` is the dashed form of the repo's absolute path,
+   e.g. a repo at `/home/dev/acme-api` becomes `-home-dev-acme-api`). For each one, check
+   whether its rule already appears in `AGENTS.md`
    (the "Hard rules", "Forbidden patterns", or "How to work here" sections). Flag any feedback
    memory that exists but was never promoted into AGENTS.md — that's a correction the user may
    have to repeat to a future session that doesn't load this specific memory file.
+
+2a. **If `ctx` is installed, search full session transcripts, not just memory files.**
+   `ctx search "actually"`, `ctx search "no, don't"`, `ctx search "I already told you"` (and
+   similar correction-shaped phrases) surface repeats that never got written to a feedback
+   memory at all — memory files only capture what a past session *chose* to save; `ctx` sees
+   everything that was actually said. Treat a hit here with no corresponding memory file as a
+   gap in step 2, not just a gap in AGENTS.md.
 
 3. **Scan recent git history for rework signal.** `git log --oneline -30`. Look for patterns:
    consecutive commits touching the same file with messages like "fix", "typo", "revert", "oops" —
    this is a proxy for low one-shot rate when transcript data isn't available.
 
-4. **Cross-reference against current guardrails.** For each anti-pattern found in steps 2–3,
+3a. **If `lean-ctx` is installed, check `lean-ctx gain` / `lean-ctx heatmap` for repeat-read
+   hotspots.** A file the agent keeps re-reading at full size across sessions is either missing
+   from memory (should be a `project`-type memory summarizing it) or missing a skill that should
+   front-load it — the same underlying gap as 2a, surfaced from the context-compression angle
+   instead of the correction angle.
+
+4. **Cross-reference against current guardrails.** For each anti-pattern found in steps 2–3a,
    check whether an existing opengrep rule, import-linter contract, or AGENTS.md rule already
    covers it. Only propose *new* rules for gaps, not duplicates.
 
