@@ -6,6 +6,28 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.7.1] — 2026-07-08
+
+### Fixed
+
+Both found from an actual rebuild attempt of chassis's own new standalone devcontainer (v0.7.0):
+
+- **Node.js/npm was never installed** unless `include_ts: true` — `ghcr.io/devcontainers/features/node:1`
+  was gated behind the TypeScript module toggle in `devcontainer.json.jinja`, but the AI-usage
+  cockpit (`codeburn`, `lean-ctx`) and the Claude Code CLI itself are all installed via `npm` in
+  `post-create.sh` regardless of the project's own language. Every plain-Python project stamped
+  from chassis (`include_ts: false`, the default) has been hitting `npm: command not found` on
+  those installs. Now unconditional, in both the template and chassis's own root
+  `devcontainer.json`.
+- **A permission failure on the agent-memory symlink step took down the entire
+  `post-create.sh`** — the `mkdir` there had no fallback, and with `set -euo pipefail`, its
+  failure aborted the whole script, meaning `uv sync`/`pre-commit install` never ran either. Hit
+  for real: a restrictive/UID-mismatched `~/.claude` bind mount on a fresh standalone chassis
+  devcontainer. Now wrapped in a subshell that degrades to a warning instead — proven by
+  reproducing the exact failure and confirming the rest of the script now runs regardless.
+
+---
+
 ## [0.7.0] — 2026-07-08
 
 ### Added

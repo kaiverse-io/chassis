@@ -141,17 +141,22 @@ fi
 # Canonical memory is git-tracked in-repo (.agents/memory). The conventional Claude
 # path lives on the ephemeral home overlay (the ~/.claude bind mount only persists on
 # LOCAL devcontainers, not remote/cloud ones), so recreate it as a symlink each build.
-# Mirrors the .claude/skills → .agents/skills pattern.
-MEM_CANON="$PWD/.agents/memory"
-MEM_LINK="$HOME/.claude/projects/${PWD//\//-}/memory"
-mkdir -p "$MEM_CANON"
-if [ -e "$MEM_LINK" ] && [ ! -L "$MEM_LINK" ]; then
-  cp -rn "$MEM_LINK"/. "$MEM_CANON"/ 2>/dev/null || true   # rescue files written before relink
-  rm -rf "$MEM_LINK"
-fi
-mkdir -p "$(dirname "$MEM_LINK")"
-ln -sfn "$MEM_CANON" "$MEM_LINK"
-echo "→ agent memory linked: $MEM_LINK → $MEM_CANON"
+# Mirrors the .claude/skills → .agents/skills pattern. Wrapped in a subshell: a
+# permission failure on the host-mounted ~/.claude (UID mismatch, restrictive bind
+# mount) must degrade to a warning, not abort the rest of this script (uv sync,
+# pre-commit install haven't run yet at this point).
+(
+  MEM_CANON="$PWD/.agents/memory"
+  MEM_LINK="$HOME/.claude/projects/${PWD//\//-}/memory"
+  mkdir -p "$MEM_CANON"
+  if [ -e "$MEM_LINK" ] && [ ! -L "$MEM_LINK" ]; then
+    cp -rn "$MEM_LINK"/. "$MEM_CANON"/ 2>/dev/null || true   # rescue files written before relink
+    rm -rf "$MEM_LINK"
+  fi
+  mkdir -p "$(dirname "$MEM_LINK")"
+  ln -sfn "$MEM_CANON" "$MEM_LINK"
+  echo "→ agent memory linked: $MEM_LINK → $MEM_CANON"
+) || echo "[warn] agent memory symlink setup failed (often a ~/.claude bind-mount permission/UID mismatch) — .agents/memory/ is still there and git-tracked, just not auto-linked into ~/.claude/projects/.../memory this build. Safe to ignore or fix the mount permissions manually."
 
 # ── Project setup ─────────────────────────────────────────────────────────────
 if [ -f pyproject.toml ]; then

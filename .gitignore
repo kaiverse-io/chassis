@@ -6,3 +6,7 @@ venv/
 .DS_Store
 Thumbs.db
 *.swp
+
+# devcontainer CLI/VS Code regenerates this on every rebuild — not worth committing
+# a snapshot that goes stale the moment devcontainer.json's features change
+.devcontainer/devcontainer-lock.json

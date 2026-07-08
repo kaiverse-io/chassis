@@ -6,9 +6,11 @@
 
   // ── Features (pinned — no "lts") ─────────────────────────────────────────
   "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {}{% if include_ts %},
-    "ghcr.io/devcontainers/features/node:1": { "version": "22" }{% endif %}
-
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    // Node/npm is unconditional, not gated behind include_ts: the AI-usage cockpit
+    // (codeburn, lean-ctx, AI Engineer Coach) and the Claude Code CLI itself are all
+    // installed via npm in post-create.sh regardless of the project's own language.
+    "ghcr.io/devcontainers/features/node:1": { "version": "22" }
   },
 
   "postCreateCommand": "bash .devcontainer/post-create.sh",
