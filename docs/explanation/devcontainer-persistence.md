@@ -21,7 +21,7 @@ else. This template uses three different somewhere-elses, each with a different 
 |---|---|---|---|
 | **Git-tracked files** | Always | Always (it's in the repo) | `.agents/memory/`, source, docs — anything that should be portable to a fresh clone |
 | **Docker named volume** | Always | No — tied to this Docker daemon | `uv-cache`, `precommit-cache`, `claude-projects`, any project-specific data store (e.g. Postgres) |
-| **Host bind mount** | Only if the host path is itself durable | No — by definition, it's this host's path | `~/.claude` (minus `/projects`), `~/.aws`, `~/.gitconfig`, `~/.ssh` — real host state you want visible inside the container |
+| **Host bind mount** | Only if the host path is itself durable | No — by definition, it's this host's path | `~/.claude` (minus `/projects`), `~/.gitconfig`, `~/.ssh`, `~/.config/gh` — real host state you want visible inside the container; `~/.aws` is the same mechanism, added per-project when needed |
 
 The bind mount's "only if" is the one that bites people. `devcontainer.json`'s `mounts` array
 binds `${localEnv:HOME}/.claude` from whatever machine is running the devcontainer. On a laptop
