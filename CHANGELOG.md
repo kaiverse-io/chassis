@@ -6,6 +6,24 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.7.4] — 2026-07-11
+
+### Fixed
+
+- **`node:1`'s default apt-based Yarn install breaks fresh builds that also enable
+  `docker-outside-of-docker`.** The feature adds the `dl.yarnpkg.com` apt repo to install
+  Yarn, but that repo's signature no longer verifies against any key in Yarn's currently
+  published keyring — confirmed by fetching `dl.yarnpkg.com/debian/pubkey.gpg` directly and
+  finding the key ID apt wants (`62D54FD4003F6525`) absent from it entirely. A fresh build
+  fails with `NO_PUBKEY 62D54FD4003F6525` during the *next* apt-based feature's own
+  `apt-get update` (docker-outside-of-docker, if enabled) — not during node's own layer,
+  which doesn't hard-fail on it. Docker layer caching hides this on an already-built
+  container (an old cached Yarn layer never re-touches the repo), which is why it only
+  surfaced on a genuinely fresh clone. `installYarnUsingApt: false` installs Yarn via
+  corepack/npm instead, skipping the broken repo entirely — no project's `post-create.sh`
+  actually shells out to `yarn`, so there's no downside even for projects that never touch
+  docker-outside-of-docker.
+
 ## [0.7.3] — 2026-07-11
 
 ### Fixed
