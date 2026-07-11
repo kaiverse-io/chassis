@@ -5,6 +5,31 @@ set -euo pipefail
 
 export PATH="$HOME/.local/bin:$PATH"
 
+# ── Fix root-owned named-volume mounts ────────────────────────────────────────
+# Docker creates a brand-new named volume's mount point as root:root before this
+# script's remoteUser (vscode) ever runs, which breaks every cache-writing step
+# below (uv sync, pip install --user, pre-commit install) with PermissionError.
+# ~/.cache is purely container-local (not one of the host bind mounts in
+# devcontainer.json), so a full chown is safe. ~/.claude *is* a host bind mount —
+# only its nested claude-projects named volume needs fixing, not the whole tree.
+sudo chown -R vscode:vscode "$HOME/.cache" 2>/dev/null || true
+mkdir -p "$HOME/.claude/projects"
+sudo chown -R vscode:vscode "$HOME/.claude/projects" 2>/dev/null || true
+
+# ── Docker-outside-of-docker socket permission fix (no-op unless opted in) ────
+# If a project has uncommented the docker-outside-of-docker feature + docker.sock
+# mount in devcontainer.json, the socket's host-side ownership/GID frequently does
+# not match this container's pre-baked `docker` group (root:root inside a Docker
+# Desktop/OrbStack VM, or behind a socket proxy, is common) — the feature adds
+# vscode to a `docker` group at a GID that may not be the one the runtime-mounted
+# socket actually has, since the mount only attaches after the feature installs.
+# Group-matching across hosts is fragile; chmod is not. Guarded on the socket
+# existing, so this is a safe no-op for every project that hasn't opted in.
+if [ -S /var/run/docker.sock ]; then
+  sudo chmod 666 /var/run/docker.sock 2>/dev/null \
+    || echo "[warn] could not chmod /var/run/docker.sock — docker-outside-of-docker may not work this session"
+fi
+
 # ── uv (Python package/venv manager) ─────────────────────────────────────────
 if ! command -v uv >/dev/null 2>&1; then
   echo "→ Installing uv …"
