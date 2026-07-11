@@ -2,7 +2,9 @@
 # Add project-specific services (databases, queues, etc.) below the app service.
 services:
   app:
-    image: mcr.microsoft.com/devcontainers/python:1-{{ python_version }}-bookworm
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: sleep infinity
     volumes:
       - ../..:/workspaces:cached

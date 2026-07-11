@@ -5,7 +5,9 @@
 # file existed.
 services:
   app:
-    image: mcr.microsoft.com/devcontainers/python:1-3.12-bookworm
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: sleep infinity
     volumes:
       - ..:/workspaces/chassis:cached
