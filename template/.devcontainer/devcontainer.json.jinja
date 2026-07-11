@@ -21,6 +21,11 @@
   "mounts": [
     // Agent memory — writable (required)
     "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
+    // Claude Code account/session state — a sibling FILE, not inside ~/.claude/ above
+    // (oauth account, mcpServers, recent-projects/trust list, onboarding flags).
+    // Writable: Claude Code updates it continuously. Requires the file to already
+    // exist on host (run Claude Code there at least once first).
+    "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude.json,type=bind,consistency=cached",
     // Git identity — read-only
     "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached,readonly",
     // SSH keys — read-only (create ~/.ssh on host if missing)

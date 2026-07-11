@@ -47,6 +47,16 @@ if ! command -v opengrep >/dev/null 2>&1; then
     || echo "[warn] opengrep pip install failed — install manually from https://github.com/opengrep/opengrep"
 fi
 
+# ── Claude Code CLI ────────────────────────────────────────────────────────────
+# The ~/.claude and ~/.claude.json bind mounts above bring the host's config,
+# memory, and account state, but not the binary itself — install it explicitly.
+# The cockpit tools below (codeburn, lean-ctx) instrument/extend this CLI.
+if ! command -v claude >/dev/null 2>&1; then
+  echo "→ Installing Claude Code CLI …"
+  npm install -g @anthropic-ai/claude-code --silent 2>/dev/null \
+    || echo "[warn] claude-code install failed (needs npm) — install manually: npm install -g @anthropic-ai/claude-code"
+fi
+
 # ── codeburn (AI usage cost/burn cockpit — bucket C) ──────────────────────────
 # Local-first: reads Claude Code's own session JSONL, no OTEL required.
 # User-authorized auto-install (2026-06-30) — see chassis CHANGELOG.
