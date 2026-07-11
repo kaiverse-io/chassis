@@ -6,6 +6,25 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.7.3] — 2026-07-11
+
+### Fixed
+
+- **`copier update` has never worked for any project stamped from chassis.** `copier.yml`
+  sets `_answers_file: .copier-answers.yml`, but that only names the file copier *would* write —
+  it doesn't make copier write one. That requires a template file literally named
+  `{{ _copier_conf.answers_file }}.jinja`, which `template/` never had, so no stamped project
+  ever got a `.copier-answers.yml` and every `copier update` failed outright with `Template not
+  found`. Found while trying to pull a devcontainer fix into an already-stamped project.
+  `just accept` now asserts the answers file exists post-stamp, and passes `--vcs-ref=HEAD`
+  explicitly — without it, `copier copy .` on a local path silently pins to the latest git tag,
+  so the acceptance test was never exercising uncommitted or untagged work on main.
+- **`docker-outside-of-docker`'s documented recipe now defaults to `"moby": false`.** The
+  feature's `moby: true` default installs CLI packages from `packages.microsoft.com`; a build
+  sandbox that only allowlists `docker.com` (a common corporate VPN/proxy shape) fails that
+  install with a bare `exit code: 100`, hiding the real cause unless rebuilt with
+  `--progress=plain`. `moby: false` routes through `download.docker.com` instead.
+
 ## [0.7.2] — 2026-07-11
 
 ### Fixed
