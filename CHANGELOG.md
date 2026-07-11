@@ -6,6 +6,26 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.7.2] — 2026-07-11
+
+### Fixed
+
+- **Fresh named-volume mounts (`uv-cache`, `precommit-cache`, `claude-projects`) came up
+  root-owned**, breaking `uv sync`, `pip install --user`, and the `pre-commit` git hook for the
+  `vscode` user with `PermissionError`. Docker initializes a brand-new named volume's mount point
+  as `root:root` before `postCreateCommand` (which runs as `remoteUser: vscode`) ever gets a
+  chance to touch it. Found for real while stamping a fresh project and hitting the failure
+  mid-`post-create.sh`. `post-create.sh` now chowns `~/.cache` (safe — container-local, not a
+  host bind mount) and the nested `~/.claude/projects` mount (scoped — `~/.claude` itself *is* a
+  host bind mount and shouldn't be recursively chowned) before any install step runs.
+- **docker-outside-of-docker documented as an opt-in recipe**, with the socket permission fix it
+  actually needs: the host-side `docker.sock` GID rarely matches this container's pre-baked
+  `docker` group, since the feature's group setup runs before the runtime mount attaches.
+  `post-create.sh` now `chmod 666`s the socket, guarded on it existing — a no-op for every
+  project that hasn't opted in.
+
+---
+
 ## [0.7.1] — 2026-07-08
 
 ### Fixed
