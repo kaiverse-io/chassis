@@ -9,12 +9,16 @@ default:
 # Stamp a throwaway project and verify just ci is green (the chassis acceptance test)
 # --trust: copier 9.x refuses to run copier.yml's _tasks (git init/uv sync/pre-commit
 # install) without it. Safe here — this is our own template, not a third-party one.
+# --vcs-ref=HEAD: without it, copier silently pins to the latest git *tag* on a local
+# path source, not the current commit — so uncommitted or untagged work on main would
+# never actually be exercised by this test. Found while verifying this recipe's own
+# .copier-answers.yml guardrail below: it kept failing against stale tagged content.
 accept:
     #!/usr/bin/env bash
     set -euo pipefail
     tmpdir=$(mktemp -d)
     echo "Stamping test project at $tmpdir …"
-    copier copy . "$tmpdir" --defaults --trust \
+    copier copy . "$tmpdir" --vcs-ref=HEAD --defaults --trust \
         --data "project_name=TestProject" \
         --data "python_package_name=test_project" \
         --data "description=Chassis acceptance test" \
@@ -23,6 +27,10 @@ accept:
         --data "github_owner=km2411" \
         --data "license=Proprietary" \
         --overwrite --quiet
+    test -f "$tmpdir/.copier-answers.yml" || {
+        echo "FAIL: .copier-answers.yml was not generated — copier update would be broken for every stamped project"
+        exit 1
+    }
     echo "Running just ci in stamped project …"
     cd "$tmpdir"
     just ci
