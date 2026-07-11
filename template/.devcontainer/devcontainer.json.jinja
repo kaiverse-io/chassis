@@ -10,7 +10,16 @@
     // Node/npm is unconditional, not gated behind include_ts: the AI-usage cockpit
     // (codeburn, lean-ctx, AI Engineer Coach) and the Claude Code CLI itself are all
     // installed via npm in post-create.sh regardless of the project's own language.
-    "ghcr.io/devcontainers/features/node:1": { "version": "22" }
+    // installYarnUsingApt: false — the feature's default apt-based Yarn install adds
+    // the dl.yarnpkg.com repo, which is effectively unmaintained (Yarn's own
+    // published keyring has rotated since; the repo's signature no longer verifies
+    // against any current key). A fresh build fails apt-get update with
+    // "NO_PUBKEY 62D54FD4003F6525" — confirmed 2026-07-11 by fetching
+    // dl.yarnpkg.com/debian/pubkey.gpg directly and finding that key ID absent from
+    // it entirely. Only bites on a true fresh build (cached layers hide it, which is
+    // why an existing container can look fine while a new clone fails immediately).
+    // Corepack/npm install Yarn fine without touching apt at all.
+    "ghcr.io/devcontainers/features/node:1": { "version": "22", "installYarnUsingApt": false }
     // Project-specific features — add here as needed:
     //   Docker-outside-of-docker — sibling containers, not nested: forwards the HOST's
     //   docker.sock (mount below) rather than running a second Docker daemon in this

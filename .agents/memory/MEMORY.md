@@ -5,3 +5,4 @@
 - [Devcontainer cache permissions](devcontainer-cache-permissions.md) — fresh builds get root-owned ~/.cache/{uv,pre-commit}, breaking uv/copier/pre-commit; `sudo chown -R vscode:vscode ~/.cache` fixes it
 - [docker-outside-of-docker moby network](devcontainer-docker-outside-of-docker-moby.md) — feature build fails "exit code 100" behind docker.com-only networks; `"moby": false` fixes it
 - [copier answers file never generated](copier-answers-file-never-generated.md) — chassis never wrote `.copier-answers.yml`, so `copier update` never worked for any stamped project; fixed + guarded in `just accept`
+- [Devcontainer yarn apt key drift](devcontainer-yarn-apt-key-drift.md) — dl.yarnpkg.com repo's signature no longer matches Yarn's published keyring; breaks fresh builds enabling docker-outside-of-docker after node; `installYarnUsingApt: false` fixes it
