@@ -20,8 +20,15 @@
     //   instead, a different feature+mount pair. Pair with the socket mount below and
     //   see post-create.sh's socket permission-fix step, which activates automatically
     //   once the mount is present — the socket's host-side ownership rarely matches
-    //   this container's pre-baked docker group, so that step is not optional:
-    //     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+    //   this container's pre-baked docker group, so that step is not optional.
+    //   `"moby": false` is deliberate, not optional either: the feature defaults to
+    //   installing `moby-cli` from packages.microsoft.com, and on a build sandbox that
+    //   only allowlists docker.com (a common corporate VPN/proxy shape), that install
+    //   fails with a bare "exit code: 100" — apt's generic failure code, with the real
+    //   cause hidden unless you rebuild with `--progress=plain`. `moby: false` installs
+    //   `docker-ce-cli` from download.docker.com instead, which is the repo that's
+    //   actually reachable in that shape of network:
+    //     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": { "moby": false }
   },
 
   "postCreateCommand": "bash .devcontainer/post-create.sh",
