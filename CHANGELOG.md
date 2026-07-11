@@ -6,6 +6,27 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.7.5] — 2026-07-11
+
+### Fixed
+
+- **v0.7.4's `installYarnUsingApt: false` fix did not actually fix the `NO_PUBKEY
+  62D54FD4003F6525` build failure** — verified by reproducing the build after applying it and
+  watching it fail identically. The real cause: `mcr.microsoft.com/devcontainers/python`
+  base images ship Yarn pre-installed at the image's own build time, apt source and all,
+  completely independent of the devcontainer `node` feature. That source's signature predates
+  Yarn's 2026-01 key rotation, and the image hasn't been republished since 2025-07-10. Because
+  it's baked into the base image, it's present before *any* feature's install layer runs, so
+  whichever feature's `apt-get update` happens to go first fails — not necessarily `node:1`,
+  and not fixable by any of its options. The actual fix has to live in a project's own
+  `.devcontainer/Dockerfile` (`RUN rm -f /etc/apt/sources.list.d/yarn.list`), since devcontainer
+  features are appended as layers on top of whatever a project's own Dockerfile produces —
+  `template/.devcontainer/Dockerfile.jinja` now does this, with `docker-compose.yml.jinja`'s
+  `app` service switched from `image:` to `build:`. Verified this time by actually building
+  chassis's own devcontainer and a freshly copier-stamped test project with the real
+  `@devcontainers/cli build`, not just `just accept`'s stamp-and-lint (which never invokes
+  Docker and would not have caught either the original bug or the incomplete v0.7.4 fix).
+
 ## [0.7.4] — 2026-07-11
 
 ### Fixed
