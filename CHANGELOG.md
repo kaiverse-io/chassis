@@ -6,6 +6,12 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.7.8] — 2026-07-12
+
+### Fixed
+
+- **`lean-ctx onboard` wrote a hard `permissions.deny` for `Bash`/`Read`/`Grep`/`Glob` into `~/.claude/settings.json`, machine-wide.** Undocumented by lean-ctx itself (checked its published docs), and confirmed empirically that neither `lean-ctx setup --yes --no-auto-approve` nor `lean-ctx init --agent claude` write it when run in isolation — `onboard` applies it as an extra step neither public command reaches. lean-ctx's own documented design (Shadow Mode: `CLAUDE.md` rules + `PreToolUse` hooks that observe/rewrite but still return `allow`) already gets the compression benefit without a hard deny — and the hard deny is actively worse on this template's actual deployment shape, since `~/.claude/settings.json` is bind-mounted from the host and shared by every devcontainer built from it on the same machine: one project's rebuild silently hard-blocked native tools in every sibling project's session too, with zero fallback when the `mcp__lean-ctx__*` MCP tools weren't reachable for any reason. `template/.devcontainer/post-create.sh` now calls `setup --yes --no-auto-approve` + `init --agent claude` instead of `onboard`.
+
 ## [0.7.7] — 2026-07-12
 
 ### Fixed
