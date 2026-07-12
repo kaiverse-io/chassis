@@ -20,9 +20,8 @@ services:
       # Docker Desktop VM's own disk, not the host machine's disk — so on a local
       # devcontainer it made session history LESS durable (a rebuild that
       # recreates the volume, e.g. after a devcontainer.json features change,
-      # silently orphans every prior session with no host-side trace). See
-      # docs/explanation/devcontainer-persistence.md. Revisit only for a project
-      # that actually runs on a remote/cloud devcontainer.
+      # silently orphans every prior session with no host-side trace). Revisit
+      # only for a project that actually runs on a remote/cloud devcontainer.
 
     environment:
       UV_LINK_MODE: copy   # volumes are on different filesystems in Docker
