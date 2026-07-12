@@ -6,6 +6,12 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.7.7] — 2026-07-12
+
+### Fixed
+
+- **`template/.devcontainer/docker-compose.yml.jinja` referenced `docs/explanation/devcontainer-persistence.md`, a doc that is never actually stamped into downstream projects.** Only `docs/decisions/adrs/adr-000-madr-template.md` is copied under `docs/` — everything in `docs/explanation/` is chassis-repo-only, describing chassis's own devcontainer setup. Every project stamped or updated from the template would have carried a dangling reference. Caught by `copier update`'s 3-way merge against a real stamped project, which had already written the same comment without the dangling reference by hand. Removed the reference from the template comment; chassis's own standalone `.devcontainer/docker-compose.yml` keeps it, since that doc genuinely lives in this repo.
+
 ## [0.7.6] — 2026-07-12
 
 ### Fixed
