@@ -166,7 +166,19 @@ if ! command -v lean-ctx >/dev/null 2>&1; then
     || echo "[warn] lean-ctx install failed — install manually: npm install -g lean-ctx-bin"
 fi
 if command -v lean-ctx >/dev/null 2>&1; then
-  lean-ctx onboard >/dev/null 2>&1 || true
+  # NOT `lean-ctx onboard`: it writes a hard permissions.deny for Bash/Read/Grep/Glob into
+  # ~/.claude/settings.json (confirmed empirically 2026-07-12 — undocumented by lean-ctx
+  # itself), which is actively harmful in this template's actual deployment shape: that
+  # settings.json is bind-mounted from the host and shared by every devcontainer built from
+  # it on the same machine, so one project's rebuild silently hard-blocks native tools in
+  # every sibling project's session too, with zero fallback when the mcp__lean-ctx__* MCP
+  # tools aren't reachable for any reason. `setup` + `init --agent claude` together give the
+  # same shell aliases + Claude Code MCP wiring without that step — confirmed via clean
+  # before/after diffs of settings.json after running each in isolation. lean-ctx's own
+  # documented design (Shadow Mode: CLAUDE.md rules + PreToolUse hooks that observe/rewrite
+  # but still return "allow") already gets the compression benefit without a hard deny.
+  lean-ctx setup --yes --no-auto-approve >/dev/null 2>&1 || true
+  lean-ctx init --agent claude >/dev/null 2>&1 || true
 fi
 
 # ── Agent memory durability ───────────────────────────────────────────────────
