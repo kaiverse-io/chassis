@@ -1,7 +1,7 @@
 ---
 kind: explanation
 status: active
-last_reviewed: 2026-07-08
+last_reviewed: 2026-07-12
 ---
 
 # Devcontainer persistence: what survives a rebuild, and what doesn't
@@ -20,8 +20,8 @@ else. This template uses three different somewhere-elses, each with a different 
 | Mechanism | Survives rebuild? | Survives a different host? | Used for |
 |---|---|---|---|
 | **Git-tracked files** | Always | Always (it's in the repo) | `.agents/memory/`, source, docs — anything that should be portable to a fresh clone |
-| **Docker named volume** | Always | No — tied to this Docker daemon | `uv-cache`, `precommit-cache`, `claude-projects`, any project-specific data store (e.g. Postgres) |
-| **Host bind mount** | Only if the host path is itself durable | No — by definition, it's this host's path | `~/.claude` (minus `/projects`), `~/.gitconfig`, `~/.ssh`, `~/.config/gh` — real host state you want visible inside the container; `~/.aws` is the same mechanism, added per-project when needed |
+| **Docker named volume** | Only if the volume itself isn't recreated | No — tied to this Docker daemon, and lives on its VM disk, not the host disk | `uv-cache`, `precommit-cache`, any project-specific data store (e.g. Postgres) |
+| **Host bind mount** | Only if the host path is itself durable | No — by definition, it's this host's path | `~/.claude` (the whole tree, including `/projects`), `~/.gitconfig`, `~/.ssh`, `~/.config/gh` — real host state you want visible inside the container; `~/.aws` is the same mechanism, added per-project when needed |
 
 The bind mount's "only if" is the one that bites people. `devcontainer.json`'s `mounts` array
 binds `${localEnv:HOME}/.claude` from whatever machine is running the devcontainer. On a laptop
@@ -42,46 +42,41 @@ generalizes: **if data needs to survive independent of the devcontainer's host, 
 That's not always possible (session transcripts aren't meant to be committed), which is why the
 other two mechanisms exist.
 
-## Why session transcripts got their own named volume
+## Why session transcripts do NOT get their own named volume (reverted 2026-07-12)
 
 Claude Code session transcripts (`~/.claude/projects/<slug>/*.jsonl`) can't go in git — they're
-local working data, not source. They also can't rely on the bind mount alone, for the reason
-above. The fix: nest a Docker **named volume** at the specific path `~/.claude/projects`, inside
-the existing `~/.claude` bind mount.
+local working data, not source. An earlier version of this template nested a Docker **named
+volume** at the specific path `~/.claude/projects`, inside the existing `~/.claude` bind mount,
+reasoning that the bind mount alone isn't durable on a remote/cloud devcontainer runner where
+`${localEnv:HOME}` may not resolve to a real host path:
 
 ```yaml
 volumes:
-  - claude-projects:/home/vscode/.claude/projects
+  - claude-projects:/home/vscode/.claude/projects   # REVERTED — do not reintroduce
 ```
 
-Docker's mount layering rule is simple: the more specific (deeper) mount wins for its subtree.
-So `~/.claude` still comes from the host bind mount for everything else (credentials, settings),
-but `~/.claude/projects` specifically now comes from the `claude-projects` volume — durable
-regardless of whether the outer bind mount's host path is itself durable.
+That reasoning was correct for the remote/cloud case, but wrong for the common case this
+template actually targets: a laptop running Docker Desktop. There, the named volume lives on
+the *Docker Desktop VM's own virtual disk*, not the host machine's disk — it is not, in fact,
+more durable than the host bind mount it was meant to protect. Worse, it's **less** durable in a
+specific, easy-to-hit way: Docker recreates a named volume's underlying storage whenever the
+compose project identity changes (e.g. certain `devcontainer.json` features/config changes
+trigger a rebuild that Docker treats as a new volume), and a fresh volume starts **empty** —
+Docker doesn't merge old and new, it just replaces what's visible at that path. This happened for
+real on a project built from this template: a routine devcontainer rebuild silently orphaned
+every prior Claude Code session with no host-side trace, because the "durable" volume had
+quietly been recreated.
 
-### The migration gotcha this introduces
-
-A named volume starts **empty**. If a project already had real session history sitting in the
-bind-mounted host path before this volume was introduced, that history doesn't move itself —
-Docker doesn't merge the two, the volume just becomes what's visible at that path going forward.
-On the *first* rebuild after adding a volume like this, existing history at that path will appear
-to vanish from the container's point of view (it's still on the host, just no longer reachable
-from inside the container, since the volume now shadows that subtree).
-
-If that matters to you, run this **on the host** (not inside the container) once, after the
-first rebuild that creates the volume:
-
-```bash
-docker volume ls | grep claude-projects   # find the actual (project-prefixed) volume name
-docker run --rm \
-  -v "<host-path-to-old-.claude-projects-slug>":/from \
-  -v <volume-name-from-above>:/to \
-  alpine sh -c "cp -a /from/. /to/"
-```
-
-There's no way to automate this from `post-create.sh` — by the time it runs, the volume has
-already replaced visibility into the old host path from inside the container. The copy has to
-happen at the host level, once, before or right after the first rebuild.
+The fix: drop the nested volume entirely. `~/.claude/projects` now falls through to the plain
+`~/.claude` host bind mount, same as everything else under `~/.claude` (credentials, settings,
+skills). On a local Docker Desktop devcontainer — the case this template is built for — that
+bind mount is a real, durable host path and always has been; removing the "safety net" volume
+removes the actual failure mode. The remote/cloud durability gap the original volume was trying
+to close is real, but nothing in this template currently runs on a remote/cloud devcontainer, and
+a volume that actively makes the common case worse is the wrong way to hedge against a case that
+doesn't apply yet. Revisit if and when a project on this template actually needs to run on a
+remote/cloud runner — see the git history of this file and `.devcontainer/docker-compose.yml`
+around 2026-07-12 for the exact mechanism, should that day come.
 
 ## What this means for tools that keep their own state
 
@@ -91,6 +86,7 @@ index (`~/.ctx`) and `lean-ctx`'s cache/stats (`~/.local/share/lean-ctx`). Neith
 in this template today — they're rebuilt from scratch (`ctx setup` / `lean-ctx onboard` re-run by
 `post-create.sh`) every time. `ctx` re-indexes existing session transcripts on `ctx setup`, so it
 self-heals as long as the transcripts themselves survived (see above); `lean-ctx`'s compression
-stats and learned patterns do not currently survive a rebuild. Following the same pattern used
-for `claude-projects` — a named volume nested at the tool's data path — would fix both, if that
-history turns out to matter enough to want in future work.
+stats and learned patterns do not currently survive a rebuild. Nesting a named volume at either
+tool's data path would "fix" that the same way `claude-projects` once did — meaning it would
+carry the identical durability trap on a local Docker Desktop devcontainer. Don't, unless it's
+paired with the bind-mount-first reasoning above and a real remote/cloud target.

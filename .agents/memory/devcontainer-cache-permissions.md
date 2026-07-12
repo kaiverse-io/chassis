@@ -18,11 +18,9 @@ file) chowns them afterward. `postCreateCommand` runs as `remoteUser: vscode`, s
 own mount ownership without `sudo`.
 
 **How to apply:** Fixed at the source in `template/.devcontainer/post-create.sh` (2026-07-11) —
-it now chowns `~/.cache` (fully, since it's container-local, not a host bind mount) and
-`~/.claude/projects` (scoped, since the parent `~/.claude` *is* a host bind mount and shouldn't
-be recursively chowned) right after `set -euo pipefail`, before any install step touches them.
-Verified via `just ci` + `just accept`. This fixes chassis's own devcontainer (symlinked) and
-every *future* `copier copy`. Already-stamped projects (e.g. aither, stamped before this fix) got
-a static copy at stamp time, not a symlink — their `.devcontainer/post-create.sh` needs the same
-patch applied manually, or a `copier update`, or just run
-`sudo chown -R vscode:vscode ~/.cache ~/.claude/projects` once by hand in the stuck container.
+it chowns `~/.cache` (fully, since it's container-local, not a host bind mount) right after
+`set -euo pipefail`, before any install step touches them. Verified via `just ci` + `just accept`.
+This fixes chassis's own devcontainer (symlinked) and every *future* `copier copy`.
+Already-stamped projects got a static copy at stamp time, not a symlink — their
+`.devcontainer/post-create.sh` needs the same patch applied manually, or a `copier update`, or
+just run `sudo chown -R vscode:vscode ~/.cache` once by hand in the stuck container.

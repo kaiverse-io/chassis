@@ -13,14 +13,13 @@ services:
       - ..:/workspaces/chassis:cached
       - uv-cache:/home/vscode/.cache/uv
       - precommit-cache:/home/vscode/.cache/pre-commit
-      # Claude Code session transcripts — see docs/explanation/devcontainer-persistence.md
-      # for why this is a named volume nested inside the ~/.claude bind mount, not just
-      # the bind mount alone.
-      - claude-projects:/home/vscode/.claude/projects
+      # Claude Code session transcripts deliberately have NO separate mount here —
+      # see docs/explanation/devcontainer-persistence.md for why a nested named
+      # volume here turned out to be less durable than the plain ~/.claude bind
+      # mount on a local devcontainer, not more.
     environment:
       UV_LINK_MODE: copy
 
 volumes:
   uv-cache:
   precommit-cache:
-  claude-projects:

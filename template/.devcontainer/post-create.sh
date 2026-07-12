@@ -10,11 +10,8 @@ export PATH="$HOME/.local/bin:$PATH"
 # script's remoteUser (vscode) ever runs, which breaks every cache-writing step
 # below (uv sync, pip install --user, pre-commit install) with PermissionError.
 # ~/.cache is purely container-local (not one of the host bind mounts in
-# devcontainer.json), so a full chown is safe. ~/.claude *is* a host bind mount —
-# only its nested claude-projects named volume needs fixing, not the whole tree.
+# devcontainer.json), so a full chown is safe.
 sudo chown -R vscode:vscode "$HOME/.cache" 2>/dev/null || true
-mkdir -p "$HOME/.claude/projects"
-sudo chown -R vscode:vscode "$HOME/.claude/projects" 2>/dev/null || true
 
 # ── Docker-outside-of-docker socket permission fix (no-op unless opted in) ────
 # If a project has uncommented the docker-outside-of-docker feature + docker.sock
