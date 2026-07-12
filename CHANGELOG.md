@@ -6,6 +6,31 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.7.6] — 2026-07-12
+
+### Fixed
+
+- **`claude-projects` named volume made Claude Code session history LESS durable on a local
+  Docker Desktop devcontainer, not more.** It was added to guarantee session transcripts survive
+  a rebuild even when the parent `~/.claude` host bind mount isn't durable (the remote/cloud
+  devcontainer case, where `${localEnv:HOME}` may not resolve to a real host path). But on a
+  laptop running Docker Desktop — the case this template actually targets — the named volume
+  lives on the Docker Desktop VM's own virtual disk, not the host machine's disk, and Docker
+  recreates a named volume's storage whenever the compose project identity changes (e.g. some
+  `devcontainer.json` features/config changes trigger this on rebuild). A fresh volume starts
+  empty and doesn't merge with the old one, so a routine rebuild could silently orphan every
+  prior session with no host-side trace — confirmed for real on a project built from this
+  template. Dropped the volume from `template/.devcontainer/docker-compose.yml.jinja` and
+  chassis's own standalone `.devcontainer/docker-compose.yml`; `~/.claude/projects` now falls
+  through to the plain `~/.claude` bind mount like everything else under `~/.claude`. Also
+  dropped the now-dead `~/.claude/projects` chown workaround in `post-create.sh` (it only existed
+  because the named volume came up root-owned) and updated
+  `docs/explanation/devcontainer-persistence.md` and the `devcontainer-cache-permissions` agent
+  memory, both of which documented the old (now-reverted) design as current. Already-stamped
+  projects predating this change won't pick it up automatically — apply the same patch by hand or
+  via `copier update`. Revisit only if a project on this template actually needs to run on a
+  remote/cloud devcontainer.
+
 ## [0.7.5] — 2026-07-11
 
 ### Fixed
