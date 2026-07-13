@@ -30,6 +30,34 @@ has. On a remote or cloud-hosted devcontainer runner, `${localEnv:HOME}` may poi
 ephemeral that doesn't survive a rebuild of the *runner* itself, not just the container — and
 there's no way to tell which situation you're in just by looking at `devcontainer.json`.
 
+## Why `settings.json` is carved out of the shared `~/.claude` mount (added 2026-07-13)
+
+The host bind mount above is genuinely shared: every devcontainer built from this template, plus
+the host's own Claude Code, all read and write the *same* `~/.claude` directory. For most of that
+directory this is fine or actively desired — `~/.claude/projects/<slug>` is already partitioned
+per project by Claude Code itself, and `~/.claude/skills` is meant to be shared (that's how
+`graphify`/`ctx` register their skills once and have them available everywhere).
+
+`~/.claude/settings.json` is the one path in that tree that is a *single, non-partitioned* file
+holding permissions, hooks, and other behavior-affecting config — and it is genuinely dangerous to
+share. A container-side tool that writes to it (see [ADR-002](../decisions/adrs/adr-002-ai-usage-cockpit.md)'s
+lean-ctx amendment: a real bug, not hypothetical) silently reconfigures or hard-blocks every
+sibling container's live session *and* the host's own Claude Code, in one write, with no warning
+at the point of failure.
+
+The fix does not touch the shared `~/.claude` mount itself — it adds a **second, more specific
+mount** on top of it, at exactly `~/.claude/settings.json`, sourced from a file inside the
+project's own repo (`.devcontainer/claude-user-settings.json`, committed, starts as `{}`). Docker
+resolves overlapping mounts by specificity, so this shadows the parent mount for that one path
+only; every other path under `~/.claude` (skills, credentials, `projects/`) still falls through to
+the real shared host directory exactly as before, with no durability change. Each project gets its
+own independent, git-visible settings.json for its container; nothing written there is reachable
+from the host or from any other project's container, by construction — not by policy or agent
+discipline. Project-specific Claude Code settings that genuinely need to travel with the repo
+(e.g. the OTEL config mentioned in [ai-usage-cockpit.md](ai-usage-cockpit.md)) belong in the
+*project-scoped* `.claude/settings.json` (committed, stamped by this template), which Claude Code
+already layers on top of the user-scoped one — that path was never part of the problem.
+
 ## Why agent memory is git-tracked, not just bind-mounted
 
 `.agents/memory/` (a coding agent's durable, cross-session notes) started as something the
