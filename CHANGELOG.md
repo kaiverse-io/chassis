@@ -6,6 +6,33 @@ Versioning: [SemVer](https://semver.org/).
 
 ---
 
+## [0.7.9] — 2026-07-13
+
+### Fixed
+
+- **`lean-ctx` removed from the cockpit entirely.** v0.7.8 stopped `post-create.sh` from calling
+  `lean-ctx onboard` (which wrote a hard `permissions.deny` for `Bash`/`Read`/`Grep`/`Glob` into
+  the shared `~/.claude/settings.json`) in favor of `setup --yes --no-auto-approve` + `init
+  --agent claude`. That was a mitigation, not a fix: the tool still sits between the agent and its
+  context by design, and the same class of undocumented-write risk remains as long as it's
+  installed. Dropped from `post-create.sh`, `devcontainer.json.jinja`, the `dev-coach` skill, the
+  `session-start-cockpit.sh` hook, and `AGENTS.md.jinja` (including the token-frugality tool-
+  preference table, which was lean-ctx-specific). The rest of the bucket-C cockpit — `codeburn`,
+  `abtop`, AI Engineer Coach, `graphify`, `ctx` — is unaffected. See
+  [ADR-002](docs/decisions/adrs/adr-002-ai-usage-cockpit.md)'s amendment note.
+- **`~/.claude/settings.json` is no longer part of the shared host `~/.claude` bind mount.** This
+  is the actual root cause the lean-ctx incident exposed, not specific to that one tool: that
+  mount is shared by *every* devcontainer built from this template plus the host's own Claude
+  Code, so *any* container-side write to `settings.json` — a permissions change, a hook, a rogue
+  install script — reaches every sibling project's live session and the host in one write, with no
+  isolation and no warning. A new, more specific mount shadows just that one path with a file
+  inside the project's own repo (`.devcontainer/claude-user-settings.json`, committed, starts as
+  `{}`); every other path under `~/.claude` (skills, credentials, `projects/<slug>` session
+  history) still falls through to the real shared host directory, unchanged, so nothing about
+  session-transcript durability regresses. See
+  [docs/explanation/devcontainer-persistence.md](docs/explanation/devcontainer-persistence.md)'s
+  new section for the full mechanism.
+
 ## [0.7.8] — 2026-07-12
 
 ### Fixed
