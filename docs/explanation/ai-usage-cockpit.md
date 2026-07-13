@@ -9,6 +9,10 @@ last_reviewed: 2026-07-08
 This explains the *practice*, not just the install list. If you only want the install list,
 see `.devcontainer/post-create.sh` and [ADR-002](../decisions/adrs/adr-002-ai-usage-cockpit.md).
 
+> **AMENDED 2026-07-13:** `lean-ctx` (referenced throughout this doc) was removed from the
+> cockpit — see [ADR-002](../decisions/adrs/adr-002-ai-usage-cockpit.md)'s amendment note for
+> why. The rest of this doc (codeburn, abtop, AI Engineer Coach, graphify, ctx) still applies.
+
 ## The problem this solves
 
 Working with a coding agent (Claude Code or otherwise) generates real signal — where it wastes

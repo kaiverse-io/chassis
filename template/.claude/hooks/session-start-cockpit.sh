@@ -24,9 +24,6 @@ docs/explanation/ai-usage-cockpit.md for the full writeup):
   communities before exploring unfamiliar code, instead of re-grepping from scratch.
 - ctx: run `ctx search "<topic>"` before starting non-trivial work — it searches full
   past session transcripts, not just memory files, for prior decisions or corrections.
-- lean-ctx: if `ctx_*` MCP tools are NOT listed as available tools this session, they
-  are inactive (installing lean-ctx mid-session doesn't load its tools until the next
-  session start) — use native Read/Grep/Bash until then, that's the correct fallback.
 - /dev-coach: run periodically, or right after a corrected mistake, to turn friction
   into a durable AGENTS.md rule instead of relearning it next session.
 MSG

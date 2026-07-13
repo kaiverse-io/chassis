@@ -11,8 +11,7 @@
 > Use both — AEC for the broader practice-score view, `/dev-coach` for closing the
 > feedback-memory-to-AGENTS.md loop specifically.
 >
-> **Also draws on `ctx` and `lean-ctx`** (same `post-create.sh` bucket-C cockpit) where present —
-> see steps 2a/3a. Neither is required; both sharpen the signal beyond memory files and git log.
+> **Also draws on `ctx`** (same `post-create.sh` bucket-C cockpit) where present — see step 2a. Not required; it sharpens the signal beyond memory files and git log.
 
 ## What this skill does
 
@@ -46,13 +45,7 @@ skills — then asks before writing anything. It never edits silently.
    consecutive commits touching the same file with messages like "fix", "typo", "revert", "oops" —
    this is a proxy for low one-shot rate when transcript data isn't available.
 
-3a. **If `lean-ctx` is installed, check `lean-ctx gain` / `lean-ctx heatmap` for repeat-read
-   hotspots.** A file the agent keeps re-reading at full size across sessions is either missing
-   from memory (should be a `project`-type memory summarizing it) or missing a skill that should
-   front-load it — the same underlying gap as 2a, surfaced from the context-compression angle
-   instead of the correction angle.
-
-4. **Cross-reference against current guardrails.** For each anti-pattern found in steps 2–3a,
+4. **Cross-reference against current guardrails.** For each anti-pattern found in step 2a,
    check whether an existing opengrep rule, import-linter contract, or AGENTS.md rule already
    covers it. Only propose *new* rules for gaps, not duplicates.
 

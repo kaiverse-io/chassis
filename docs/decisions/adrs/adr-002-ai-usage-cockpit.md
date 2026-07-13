@@ -10,6 +10,14 @@ last_reviewed: 2026-07-08
 - **Status:** Accepted (2026-07-08)
 - **Deciders:** founder
 
+> **AMENDED 2026-07-13:** `lean-ctx` removed from the cockpit entirely. Twice caused
+> machine-wide lockouts of native `Bash`/`Read`/`Grep`/`Glob` tools across every devcontainer
+> on the host — it writes a hard `permissions.deny` into the shared, bind-mounted
+> `~/.claude/settings.json` (one project's rebuild or even an ordinary session start could
+> silently block every other stamped project's live session), via undocumented default
+> behavior in an unpinned upstream dependency. The other bucket-C tools (codeburn, abtop,
+> AI Engineer Coach, graphify, ctx) are unaffected and remain in place.
+
 > For the plain-language version of this decision — what each tool does, how the loop works,
 > why it's language-agnostic, and how to extend it — see
 > [docs/explanation/ai-usage-cockpit.md](../../explanation/ai-usage-cockpit.md). This ADR is the

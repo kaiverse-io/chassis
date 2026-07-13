@@ -72,7 +72,7 @@ fi
 # ── Claude Code CLI ────────────────────────────────────────────────────────────
 # The ~/.claude and ~/.claude.json bind mounts above bring the host's config,
 # memory, and account state, but not the binary itself — install it explicitly.
-# The cockpit tools below (codeburn, lean-ctx) instrument/extend this CLI.
+# The cockpit tools below (codeburn) instrument/extend this CLI.
 if ! command -v claude >/dev/null 2>&1; then
   echo "→ Installing Claude Code CLI …"
   npm install -g @anthropic-ai/claude-code --silent 2>/dev/null \
@@ -150,35 +150,6 @@ if ! command -v ctx >/dev/null 2>&1; then
 fi
 if command -v ctx >/dev/null 2>&1; then
   ctx setup >/dev/null 2>&1 || true
-fi
-
-# ── lean-ctx (context-compression MCP layer — bucket C) ───────────────────────
-# https://github.com/yvgude/lean-ctx. Gates what the agent reads, caches re-reads, and
-# compresses shell/tool output — 60-90% token savings, receipts via `lean-ctx gain`. More
-# invasive than the other cockpit tools: it sits between the agent and its context, not
-# just observing it. Installed via its npm-packaged prebuilt binary — building the Rust
-# source directly needs edition-2024 (rustc 1.85+) and OOM'd a 8GB devcontainer via its
-# LTO release profile, so npm is both simpler and more reliable here.
-# User-authorized auto-install (2026-07-08) — see chassis CHANGELOG.
-if ! command -v lean-ctx >/dev/null 2>&1; then
-  echo "→ Installing lean-ctx …"
-  npm install -g lean-ctx-bin --silent 2>/dev/null \
-    || echo "[warn] lean-ctx install failed — install manually: npm install -g lean-ctx-bin"
-fi
-if command -v lean-ctx >/dev/null 2>&1; then
-  # NOT `lean-ctx onboard`: it writes a hard permissions.deny for Bash/Read/Grep/Glob into
-  # ~/.claude/settings.json (confirmed empirically 2026-07-12 — undocumented by lean-ctx
-  # itself), which is actively harmful in this template's actual deployment shape: that
-  # settings.json is bind-mounted from the host and shared by every devcontainer built from
-  # it on the same machine, so one project's rebuild silently hard-blocks native tools in
-  # every sibling project's session too, with zero fallback when the mcp__lean-ctx__* MCP
-  # tools aren't reachable for any reason. `setup` + `init --agent claude` together give the
-  # same shell aliases + Claude Code MCP wiring without that step — confirmed via clean
-  # before/after diffs of settings.json after running each in isolation. lean-ctx's own
-  # documented design (Shadow Mode: CLAUDE.md rules + PreToolUse hooks that observe/rewrite
-  # but still return "allow") already gets the compression benefit without a hard deny.
-  lean-ctx setup --yes --no-auto-approve >/dev/null 2>&1 || true
-  lean-ctx init --agent claude >/dev/null 2>&1 || true
 fi
 
 # ── Agent memory durability ───────────────────────────────────────────────────
