@@ -11,6 +11,14 @@ last_reviewed: 2026-07-13
 - **Deciders:** founder
 - **Date:** 2026-07-13
 
+> **AMENDED 2026-07-14 (v0.8.1):** the shadow file is now **generated as `{}` and gitignored**,
+> not committed. It doubles as the live user-level `settings.json` the container writes to
+> (model, effort, onboarding flags), so committing it churned the tree every session and risked
+> pinning one developer's prefs onto everyone — the same config-template-vs-live-config split the
+> repo already makes for `.env` (ignored) vs `.env.example` (committed). `devcontainer.json`'s
+> `initializeCommand` creates it host-side before the mount resolves, so the bind source is
+> always a real file. The isolation mechanism (the more-specific mount) is unchanged.
+
 ## Context
 
 The chassis devcontainer bind-mounts the host's `~/.claude` directory into every container
@@ -51,9 +59,10 @@ The problem is structural — *shared mutable agent config* — not specific to 
 ## Decision
 
 Add a second bind mount, more specific than the `~/.claude` mount, at exactly
-`~/.claude/settings.json`, sourced from a file inside the project's own repo
-(`.devcontainer/claude-user-settings.json`, committed, starts as `{}`). Docker resolves
-overlapping mounts by specificity, so this shadows the parent mount for that one path only.
+`~/.claude/settings.json`, sourced from a file inside the project's own `.devcontainer/`
+(`.devcontainer/claude-user-settings.json` — generated as `{}` by `devcontainer.json`'s
+`initializeCommand` and gitignored; see the amendment above). Docker resolves overlapping
+mounts by specificity, so this shadows the parent mount for that one path only.
 Every other path under `~/.claude` (skills, credentials, `projects/<slug>`) still falls through
 to the real shared host directory, unchanged.
 
@@ -70,8 +79,9 @@ top of the user-scoped one — that path was never part of the problem. Full mec
 host — the blast radius is one container. The shared parts of `~/.claude` keep working exactly as
 before. Isolation is enforced by the mount topology, not by trusting tools.
 
-**Bad / risks:** the shadow file is committed to each project's repo, so contributors should
-avoid putting machine-specific or sensitive values in it (it starts as `{}` for that reason).
-A settings change a developer genuinely wants shared across their own projects now has to be made
-in each project, or in the host `~/.claude` before the shadow mount is added — a deliberate
-trade of convenience for isolation.
+**Bad / risks:** because the file is generated and gitignored, a settings change a developer
+genuinely wants shared across their own projects now has to be made in each project (or in the
+host `~/.claude` before the shadow mount is added) — a deliberate trade of convenience for
+isolation. The `initializeCommand` assumes a POSIX-ish host shell (fine on macOS/Linux and
+WSL2, chassis's actual targets); a native-Windows host without one would need the file created
+another way.

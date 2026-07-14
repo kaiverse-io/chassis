@@ -9,6 +9,11 @@
     "ghcr.io/devcontainers/features/node:1": { "version": "22" }
   },
 
+  // Generate the shadow settings.json (mounted below) as `{}` before the container
+  // starts, if absent. It's gitignored, not tracked — Claude Code writes live per-dev
+  // prefs into it. Runs on the host, so the bind source is a real file, never a
+  // Docker-created directory. See docs/explanation/devcontainer-persistence.md / ADR-003.
+  "initializeCommand": "test -f .devcontainer/claude-user-settings.json || echo '{}' > .devcontainer/claude-user-settings.json",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
 
   "mounts": [
@@ -16,7 +21,8 @@
     // Isolate chassis's own container settings.json from the shared ~/.claude mount
     // above and from every project stamped from this template — see the same mount
     // in template/.devcontainer/devcontainer.json.jinja and
-    // docs/explanation/devcontainer-persistence.md for why.
+    // docs/explanation/devcontainer-persistence.md for why. The source is generated
+    // (gitignored) by initializeCommand above, not committed.
     "source=${localWorkspaceFolder}/.devcontainer/claude-user-settings.json,target=/home/vscode/.claude/settings.json,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude.json,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached,readonly",

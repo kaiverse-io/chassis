@@ -47,13 +47,20 @@ host's own Claude Code, in one write, with no warning at the point of failure. S
 
 The fix does not touch the shared `~/.claude` mount itself — it adds a **second, more specific
 mount** on top of it, at exactly `~/.claude/settings.json`, sourced from a file inside the
-project's own repo (`.devcontainer/claude-user-settings.json`, committed, starts as `{}`). Docker
-resolves overlapping mounts by specificity, so this shadows the parent mount for that one path
-only; every other path under `~/.claude` (skills, credentials, `projects/`) still falls through to
-the real shared host directory exactly as before, with no durability change. Each project gets its
-own independent, git-visible settings.json for its container; nothing written there is reachable
-from the host or from any other project's container, by construction — not by policy or agent
-discipline. Project-specific Claude Code settings that genuinely need to travel with the repo
+project's own `.devcontainer/` (`.devcontainer/claude-user-settings.json`). Docker resolves
+overlapping mounts by specificity, so this shadows the parent mount for that one path only; every
+other path under `~/.claude` (skills, credentials, `projects/`) still falls through to the real
+shared host directory exactly as before, with no durability change. Each project gets its own
+independent settings.json for its container; nothing written there is reachable from the host or
+from any other project's container, by construction — not by policy or agent discipline.
+
+That shadow file is **generated, not committed.** It doubles as the live user-level
+`settings.json` the container's Claude Code writes into (model, effort, onboarding flags), so
+tracking it would dirty the tree every session and risk committing one developer's prefs for
+everyone — the same reason `.env` is gitignored while `.env.example` is committed. It's listed in
+`.gitignore`, and `devcontainer.json`'s `initializeCommand` creates it as `{}` on the host before
+the container starts if it's absent (so the bind source is always a real file, never a
+Docker-created directory on a fresh clone). Project-specific Claude Code settings that genuinely need to travel with the repo
 (e.g. the OTEL config mentioned in [ai-usage-cockpit.md](ai-usage-cockpit.md)) belong in the
 *project-scoped* `.claude/settings.json` (committed, stamped by this template), which Claude Code
 already layers on top of the user-scoped one — that path was never part of the problem.
