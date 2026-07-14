@@ -1,7 +1,7 @@
 ---
 kind: explanation
 status: active
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-13
 ---
 
 # Devcontainer persistence: what survives a rebuild, and what doesn't
@@ -30,7 +30,7 @@ has. On a remote or cloud-hosted devcontainer runner, `${localEnv:HOME}` may poi
 ephemeral that doesn't survive a rebuild of the *runner* itself, not just the container — and
 there's no way to tell which situation you're in just by looking at `devcontainer.json`.
 
-## Why `settings.json` is carved out of the shared `~/.claude` mount (added 2026-07-13)
+## Why `settings.json` is carved out of the shared `~/.claude` mount
 
 The host bind mount above is genuinely shared: every devcontainer built from this template, plus
 the host's own Claude Code, all read and write the *same* `~/.claude` directory. For most of that
@@ -39,11 +39,11 @@ per project by Claude Code itself, and `~/.claude/skills` is meant to be shared 
 `graphify`/`ctx` register their skills once and have them available everywhere).
 
 `~/.claude/settings.json` is the one path in that tree that is a *single, non-partitioned* file
-holding permissions, hooks, and other behavior-affecting config — and it is genuinely dangerous to
-share. A container-side tool that writes to it (see [ADR-002](../decisions/adrs/adr-002-ai-usage-cockpit.md)'s
-lean-ctx amendment: a real bug, not hypothetical) silently reconfigures or hard-blocks every
-sibling container's live session *and* the host's own Claude Code, in one write, with no warning
-at the point of failure.
+holding permissions, hooks, and other behavior-affecting config — and it is genuinely dangerous
+to share. Any container-side write to it — a permissions change, a hook, an install script's
+undocumented default — silently reconfigures every sibling container's live session *and* the
+host's own Claude Code, in one write, with no warning at the point of failure. See
+[ADR-003](../decisions/adrs/adr-003-settings-json-isolation.md) for the decision record.
 
 The fix does not touch the shared `~/.claude` mount itself — it adds a **second, more specific
 mount** on top of it, at exactly `~/.claude/settings.json`, sourced from a file inside the
@@ -70,7 +70,7 @@ generalizes: **if data needs to survive independent of the devcontainer's host, 
 That's not always possible (session transcripts aren't meant to be committed), which is why the
 other two mechanisms exist.
 
-## Why session transcripts do NOT get their own named volume (reverted 2026-07-12)
+## Why session transcripts do NOT get their own named volume
 
 Claude Code session transcripts (`~/.claude/projects/<slug>/*.jsonl`) can't go in git — they're
 local working data, not source. An earlier version of this template nested a Docker **named
@@ -88,33 +88,28 @@ template actually targets: a laptop running Docker Desktop. There, the named vol
 the *Docker Desktop VM's own virtual disk*, not the host machine's disk — it is not, in fact,
 more durable than the host bind mount it was meant to protect. Worse, it's **less** durable in a
 specific, easy-to-hit way: Docker recreates a named volume's underlying storage whenever the
-compose project identity changes (e.g. certain `devcontainer.json` features/config changes
-trigger a rebuild that Docker treats as a new volume), and a fresh volume starts **empty** —
-Docker doesn't merge old and new, it just replaces what's visible at that path. This happened for
-real on a project built from this template: a routine devcontainer rebuild silently orphaned
-every prior Claude Code session with no host-side trace, because the "durable" volume had
-quietly been recreated.
+compose project identity changes (certain `devcontainer.json` features/config changes trigger a
+rebuild that Docker treats as a new volume), and a fresh volume starts **empty** — Docker
+doesn't merge old and new, it just replaces what's visible at that path. A routine rebuild can
+therefore silently orphan every prior session with no host-side trace.
 
-The fix: drop the nested volume entirely. `~/.claude/projects` now falls through to the plain
-`~/.claude` host bind mount, same as everything else under `~/.claude` (credentials, settings,
-skills). On a local Docker Desktop devcontainer — the case this template is built for — that
-bind mount is a real, durable host path and always has been; removing the "safety net" volume
-removes the actual failure mode. The remote/cloud durability gap the original volume was trying
-to close is real, but nothing in this template currently runs on a remote/cloud devcontainer, and
-a volume that actively makes the common case worse is the wrong way to hedge against a case that
-doesn't apply yet. Revisit if and when a project on this template actually needs to run on a
-remote/cloud runner — see the git history of this file and `.devcontainer/docker-compose.yml`
-around 2026-07-12 for the exact mechanism, should that day come.
+The principle this proved: **a "safety net" that's less durable than the thing it protects is a
+new failure mode, not a hedge.** `~/.claude/projects` now falls through to the plain `~/.claude`
+host bind mount, same as everything else under `~/.claude`. The remote/cloud durability gap the
+volume was trying to close is real, but nothing in this template currently runs on a
+remote/cloud devcontainer, and a volume that actively makes the common case worse is the wrong
+way to hedge against a case that doesn't apply yet. Revisit if and when a project on this
+template actually needs a remote/cloud runner — the git history of this file and
+`.devcontainer/docker-compose.yml` has the exact mechanism, should that day come.
 
 ## What this means for tools that keep their own state
 
-Two of the AI-usage cockpit tools ([docs/explanation/ai-usage-cockpit.md](ai-usage-cockpit.md))
-keep meaningful local state that isn't covered by any of the above yet: `ctx`'s session-history
-index (`~/.ctx`) and `lean-ctx`'s cache/stats (`~/.local/share/lean-ctx`). Neither has a volume
-in this template today — they're rebuilt from scratch (`ctx setup` / `lean-ctx onboard` re-run by
-`post-create.sh`) every time. `ctx` re-indexes existing session transcripts on `ctx setup`, so it
-self-heals as long as the transcripts themselves survived (see above); `lean-ctx`'s compression
-stats and learned patterns do not currently survive a rebuild. Nesting a named volume at either
-tool's data path would "fix" that the same way `claude-projects` once did — meaning it would
-carry the identical durability trap on a local Docker Desktop devcontainer. Don't, unless it's
-paired with the bind-mount-first reasoning above and a real remote/cloud target.
+One AI-usage cockpit tool ([docs/explanation/ai-usage-cockpit.md](ai-usage-cockpit.md)) keeps
+meaningful local state that isn't covered by any of the above: `ctx`'s session-history index
+(`~/.ctx`). It has no volume in this template — it's rebuilt from scratch (`ctx setup`, re-run
+by `post-create.sh`) every time, and it self-heals by re-indexing existing session transcripts,
+so nothing is lost as long as the transcripts themselves survived (see above). Nesting a named
+volume at its data path would "fix" rebuild persistence the same way `claude-projects` once did
+— meaning it would carry the identical durability trap on a local Docker Desktop devcontainer.
+Don't, unless it's paired with the bind-mount-first reasoning above and a real remote/cloud
+target.

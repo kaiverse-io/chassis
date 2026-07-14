@@ -10,3 +10,9 @@ Thumbs.db
 # devcontainer CLI/VS Code regenerates this on every rebuild — not worth committing
 # a snapshot that goes stale the moment devcontainer.json's features change
 .devcontainer/devcontainer-lock.json
+
+# graphify regenerates this from the repo itself — not worth committing
+graphify-out/
+
+# Claude Code per-user/per-machine overrides (settings.json is the shared, checked-in layer)
+.claude/settings.local.json

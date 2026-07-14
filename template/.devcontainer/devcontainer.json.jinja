@@ -52,10 +52,10 @@
     // mount above and from every other project's container. settings.json is the
     // one path under ~/.claude that is a single, non-project-namespaced shared
     // file (unlike ~/.claude/projects/<slug>, which is already partitioned per
-    // project) — a container-side tool writing to it (a past lean-ctx bug; see
-    // docs/explanation/devcontainer-persistence.md) silently reconfigured or
-    // hard-blocked every sibling container's session, and the host's own Claude
-    // Code, in one write. This file lives in THIS project's own repo (committed,
+    // project) — any container-side write to it (a permissions change, a hook, an
+    // install script's undocumented default) silently reconfigures or hard-blocks
+    // every sibling container's session, and the host's own Claude Code, in one
+    // write. This file lives in THIS project's own repo (committed,
     // starts as `{}`) and shadows the parent mount for just this one path — a
     // more specific mount overrides the broader one at the same path, so nothing
     // written here ever reaches the host or any other project again.

@@ -6,7 +6,7 @@ last_reviewed: 2026-07-08
 
 # Chassis — Agent Context
 
-> The Copier template that stamps all km2411 projects with AI-native guardrails from commit 1.
+> The Copier template that stamps new projects with AI-native guardrails from commit 1.
 > This repo dogfoods the guide it enforces: it has its own ADRs, Diátaxis docs, and passes
 > its own gates — including its own copy of the AI-usage cockpit below. CLAUDE.md is a symlink
 > to this file.
@@ -23,10 +23,9 @@ last_reviewed: 2026-07-08
   ctx.
 - Wired-but-waiting slots (D): eval gate, ADLC agent-change gate, arch-drift.
 
-See [docs/explanation/layered-model.md](docs/explanation/layered-model.md) for the full
-ten-layer breakdown of *why* each piece exists (mapped to 12-factor-agents where applicable),
-and [docs/explanation/two-plane-model.md](docs/explanation/two-plane-model.md) for why chassis
-stops exactly where a shipped product's own architecture begins.
+See [docs/explanation/design.md](docs/explanation/design.md) for the full breakdown of *why*
+each piece exists — the two-plane model, the buckets, the ten capability layers, and the
+harness-plane rules for what may sit between an agent and its context.
 
 ## Structure
 

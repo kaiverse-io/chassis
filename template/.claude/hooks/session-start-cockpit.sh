@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # SessionStart hook — refreshes the AI-usage cockpit and reminds the agent it exists.
 # Whatever this script prints to stdout is added directly to the agent's context at
-# session start (before the first prompt) — see docs/explanation/ai-usage-cockpit.md
-# and docs/explanation/layered-model.md ("Coaching" / "Context Engineering" layers).
+# session start (before the first prompt) — see chassis's docs/explanation/
+# ai-usage-cockpit.md and design.md ("Coaching" / "Context Engineering" layers).
 #
 # Best-effort only: SessionStart hooks cannot block the session, so every step here
 # is guarded to fail silently rather than surface a startup error for a bucket-C
@@ -18,8 +18,8 @@ if command -v ctx >/dev/null 2>&1; then
 fi
 
 cat <<'MSG'
-AI-usage cockpit active for this project (see AGENTS.md "Token frugality" and
-docs/explanation/ai-usage-cockpit.md for the full writeup):
+AI-usage cockpit active for this project (see AGENTS.md "AI-usage cockpit &
+coaching" for the full writeup):
 - graphify: graphify-out/GRAPH_REPORT.md was just refreshed — check its God Nodes /
   communities before exploring unfamiliar code, instead of re-grepping from scratch.
 - ctx: run `ctx search "<topic>"` before starting non-trivial work — it searches full
