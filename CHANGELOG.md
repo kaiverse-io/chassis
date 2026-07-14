@@ -9,6 +9,24 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
+## [0.8.1] — 2026-07-14
+
+### Fixed
+
+- The shadow `settings.json` ([ADR-003](docs/decisions/adrs/adr-003-settings-json-isolation.md))
+  is now **generated as `{}` by `devcontainer.json`'s `initializeCommand` and gitignored**,
+  instead of committed. It doubles as the live user-level settings Claude Code writes into (model,
+  effort, onboarding flags), so tracking it churned the working tree every session and risked
+  committing one developer's prefs for everyone — now the same `.env` / `.env.example` split the
+  repo already uses. `initializeCommand` creates it host-side before the mount resolves, so the
+  bind source is always a real file (also fixing the latent "Docker makes a directory" case on a
+  fresh clone).
+
+### Changed
+
+- Pruned a stale agent-memory entry (a copier-answers bug now fixed and guarded by `just accept`)
+  and scrubbed consuming-project names from the remaining entries.
+
 ## [0.8.0] — 2026-07-14
 
 Open-source readiness: docs describe the current design only, installs are pinned, and the
