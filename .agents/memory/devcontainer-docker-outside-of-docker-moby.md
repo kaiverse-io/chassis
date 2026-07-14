@@ -18,8 +18,9 @@ imports Microsoft's apt repo (`packages.microsoft.com`); `moby: false` imports D
 repo (`download.docker.com`, package `docker-ce-cli`) instead. Bookworm/other codenames are
 supported either way per `DOCKER_MOBY_ARCHIVE_VERSION_CODENAMES` — this isn't the classic
 distro-compatibility failure mode ([devcontainers/features#742](https://github.com/devcontainers/features/issues/742)),
-it's specifically which vendor's repo the sandbox can reach. Found debugging aither's devcontainer
-build, which hit this exact failure with the base image `mcr.microsoft.com/devcontainers/python:1-3.12-bookworm`.
+it's specifically which vendor's repo the sandbox can reach. Found debugging a downstream
+project's devcontainer build, which hit this exact failure with the base image
+`mcr.microsoft.com/devcontainers/python:1-3.12-bookworm`.
 
 **How to apply:** chassis's documented opt-in recipe in
 `template/.devcontainer/devcontainer.json.jinja` now defaults the snippet to
