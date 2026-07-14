@@ -9,7 +9,10 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
-## [Unreleased]
+## [0.8.0] — 2026-07-14
+
+Open-source readiness: docs describe the current design only, installs are pinned, and the
+standing rule against read-path interceptors is now a decision record.
 
 ### Added
 
@@ -17,17 +20,21 @@ changed, tersely. Anything longer is in git history or an ADR.
   isolation) and [ADR-004](docs/decisions/adrs/adr-004-no-silent-rewriters.md) (no silent
   rewriters in the agent's read path) — promote two decisions from changelog prose to records.
 - `install_ai_coach` copier variable (default `false`): the AI Engineer Coach build is now
-  opt-in, so its unpinned `git clone` + `npm ci` of HEAD no longer runs by default.
-- OSS scaffolding: `LICENSE` (Apache-2.0), root `.github/workflows/ci.yml`, `CONTRIBUTING.md`,
-  `SECURITY.md`.
+  opt-in (and pinned to a commit when enabled), so its `git clone` + `npm ci` of upstream source
+  no longer runs by default.
+- OSS scaffolding: `LICENSE` (Apache-2.0), root `.github/workflows/ci.yml` (`just ci` +
+  `just accept` + a real devcontainer image build), `CONTRIBUTING.md`, `SECURITY.md`.
 
 ### Changed
 
 - Docs describe the current design only (history moved to git/CHANGELOG/ADRs). Merged
   `chassis-design.md` + `two-plane-model.md` + `layered-model.md` into
-  `docs/explanation/design.md`; the cockpit is five tools.
+  `docs/explanation/design.md`; absorbed `docs/how-to/release-a-chassis-version.md` into
+  `CONTRIBUTING.md`; the cockpit is five tools.
 - Pinned cockpit install versions (codeburn, abtop, graphify, ctx) — no unattended "latest" in
-  other people's containers.
+  other people's containers; `ctx` now installs from a versioned release asset with checksum
+  verification instead of a piped install script.
+- Scrubbed consuming-project references so the repo names no downstream project.
 
 ## [0.7.9] — 2026-07-13
 
