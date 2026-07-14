@@ -52,9 +52,8 @@ copier update --trust
 ```
 
 Note: `copier update`/`copier copy` resolve the **latest git tag**, not `main`'s HEAD — a commit
-that isn't tagged yet won't show up. See
-[docs/how-to/release-a-chassis-version.md](docs/how-to/release-a-chassis-version.md) if you're
-the one shipping the chassis change, not just consuming it.
+that isn't tagged yet won't show up. See [CONTRIBUTING.md](CONTRIBUTING.md#releasing-a-version)
+if you're the one shipping the chassis change, not just consuming it.
 
 ## Working on chassis itself
 
@@ -68,7 +67,7 @@ gotten too heavy. Full reasoning in `AGENTS.md`.
 ## Versioning
 
 SemVer tags + `CHANGELOG.md`. `copier update` in a stamped project pulls improvements.
-See [docs/how-to/release-a-chassis-version.md](docs/how-to/release-a-chassis-version.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md#releasing-a-version) for the release process.
 
 ## Docs
 

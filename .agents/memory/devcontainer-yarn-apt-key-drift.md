@@ -45,7 +45,7 @@ verified by actually building both chassis's own devcontainer and a freshly copi
 project with the real `@devcontainers/cli build` (not just `just accept`'s stamp-and-lint —
 that doesn't invoke Docker at all and would not have caught this).
 
-**Why example_project looked unaffected:** example_project already had this *exact* fix (a hand-written
+**Why one downstream repo looked unaffected:** it already had this *exact* fix (a hand-written
 `.devcontainer/Dockerfile` with the same `rm -f` line) from an earlier session, predating this
 one — it wasn't cache luck, it was a real fix that had already landed there and nowhere else.
 `installYarnUsingApt: false` is still set on `node:1` across these repos as harmless

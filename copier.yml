@@ -10,11 +10,11 @@ _tasks:
 
 project_name:
   type: str
-  help: "Human-readable project name (e.g. 'ExampleProject')"
+  help: "Human-readable project name (e.g. 'Acme Service')"
 
 python_package_name:
   type: str
-  help: "Python package name — snake_case (e.g. 'example_project')"
+  help: "Python package name — snake_case (e.g. 'acme_service')"
   default: "{{ project_name | lower | replace(' ', '_') | replace('-', '_') }}"
 
 description:
@@ -29,6 +29,11 @@ python_version:
 include_ts:
   type: bool
   help: "Include TypeScript module? (opt-in)"
+  default: false
+
+install_ai_coach:
+  type: bool
+  help: "Install AI Engineer Coach? Opt-in — it publishes no release, so enabling it builds a VS Code extension from upstream source (git clone + npm ci, pinned to a commit), and its Claude Code session-log support is unconfirmed."
   default: false
 
 author_name:

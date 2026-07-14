@@ -84,9 +84,9 @@ from the empty seed it started from.
   file's cockpit section in sync with `template/AGENTS.md.jinja`'s (checked by `just ci`, not
   just promised — see the `ci-lint` recipe).
 - **Thin** — resist the urge to add features; validate via stamping, not by growing the template.
-- **No ExampleProject (or any other consuming project) references, anywhere in this repo** — chassis
-  is independent, meant to be cloned and used on its own. If a doc or config file here needs a
-  specific project's name to make sense, that content belongs in the consuming project, not here.
+- **No consuming-project references, anywhere in this repo** — chassis is independent, meant to
+  be cloned and used on its own. If a doc or config file here needs a specific downstream
+  project's name to make sense, that content belongs in the consuming project, not here.
 - **Contribution rule:** generic improvement → bump chassis version; project-specific rule →
   goes in the project's own slots, never upstreamed here.
 
@@ -111,10 +111,12 @@ project gets). One file per insight; `MEMORY.md` index (one line per entry).
   `just monitor` (abtop — live context %, tokens, rate limits) are installed by
   `.devcontainer/post-create.sh`. Both read local session data; no OTEL required.
 - **AI Engineer Coach** (VS Code dashboard, [microsoft/ai-engineering-coach](https://github.com/microsoft/ai-engineering-coach))
-  is built from source and installed by `.devcontainer/post-create.sh` — 45 anti-pattern
-  rules, practice scores, skill mining. Open via Cmd/Ctrl+Shift+P → "AI Engineer Coach:
-  Open Dashboard". **Claude Code session-log support is unconfirmed** (the project documents
-  GitHub Copilot harnesses) — verify what it actually surfaces for this project.
+  is **opt-in** (`install_ai_coach`, default off). When enabled, `.devcontainer/post-create.sh`
+  builds it from source (pinned to a commit) — 45 anti-pattern rules, practice scores, skill
+  mining; open via Cmd/Ctrl+Shift+P → "AI Engineer Coach: Open Dashboard". Off by default
+  because it builds upstream source unattended and its **Claude Code session-log support is
+  unconfirmed** (the project documents GitHub Copilot harnesses) — if you enable it, verify
+  what it actually surfaces for this project.
 - **graphify** (`/graphify`, [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify))
   — turns the repo into a queryable knowledge graph (`graphify-out/graph.json`/`GRAPH_REPORT.md`),
   installed via `uv tool install graphifyy` by `.devcontainer/post-create.sh`. Check

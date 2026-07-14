@@ -32,7 +32,7 @@ from commit 1.
 |---|---|---|
 | **codeburn** | Cost/burn, one-shot rate, by project/model/task | Feeds `/dev-coach`'s step 1 |
 | **abtop** | Live context %, tokens, rate limits | Real-time only; nothing to close a loop on |
-| **AI Engineer Coach** | 45 anti-pattern rules, practice scores (VS Code dashboard) | Parallel, broader view — complements `/dev-coach`, doesn't replace it |
+| **AI Engineer Coach** *(opt-in)* | 45 anti-pattern rules, practice scores (VS Code dashboard) | Parallel, broader view — complements `/dev-coach`, doesn't replace it |
 | **graphify** | A queryable knowledge graph of the codebase | Comprehension accelerant — fewer tokens spent re-discovering structure |
 | **ctx** | Full local session transcripts, indexed and searchable | Feeds `/dev-coach`'s step 2a — finds corrections the agent got that never made it into a memory file |
 
@@ -40,6 +40,12 @@ Only two of the five feed the loop directly (`ctx` and `codeburn`). The others a
 on their own: `abtop` is just a live dashboard, `graphify` just makes the agent faster at
 understanding code, `AI Engineer Coach` is a second, independent lens. None of them are
 required for any other tool to work — that's deliberate (see "Quality controls").
+
+`AI Engineer Coach` is the one tool that is **opt-in and off by default** (`install_ai_coach`
+in `copier.yml`): it publishes no release, so enabling it builds the extension from upstream
+source unattended, and its Claude Code session-log support is unconfirmed. The other four
+install automatically. Enable it per project if you want the dashboard and are willing to
+verify what it surfaces.
 
 Every tool in the cockpit is a **passive observer or an on-demand advisor**: it reads local
 session data or answers when asked, and nothing sits between the agent and its context

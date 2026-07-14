@@ -60,10 +60,12 @@ loss across sessions and feeds the coaching loop (Factor 2/3 of 12-factor-agents
   `just monitor` (abtop — live context %, tokens, rate limits) are installed by
   `.devcontainer/post-create.sh`. Both read local session data; no OTEL required.
 - **AI Engineer Coach** (VS Code dashboard, [microsoft/ai-engineering-coach](https://github.com/microsoft/ai-engineering-coach))
-  is built from source and installed by `.devcontainer/post-create.sh` — 45 anti-pattern
-  rules, practice scores, skill mining. Open via Cmd/Ctrl+Shift+P → "AI Engineer Coach:
-  Open Dashboard". **Claude Code session-log support is unconfirmed** (the project documents
-  GitHub Copilot harnesses) — verify what it actually surfaces for this project.
+  is **opt-in** (`install_ai_coach`, default off). When enabled, `.devcontainer/post-create.sh`
+  builds it from source (pinned to a commit) — 45 anti-pattern rules, practice scores, skill
+  mining; open via Cmd/Ctrl+Shift+P → "AI Engineer Coach: Open Dashboard". Off by default
+  because it builds upstream source unattended and its **Claude Code session-log support is
+  unconfirmed** (the project documents GitHub Copilot harnesses) — if you enable it, verify
+  what it actually surfaces for this project.
 - **graphify** (`/graphify`, [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify))
   — turns the repo into a queryable knowledge graph (`graphify-out/graph.json`/`GRAPH_REPORT.md`),
   installed via `uv tool install graphifyy` by `.devcontainer/post-create.sh`. Check

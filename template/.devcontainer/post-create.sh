@@ -81,34 +81,45 @@ fi
 
 # ── codeburn (AI usage cost/burn cockpit — bucket C) ──────────────────────────
 # Local-first: reads Claude Code's own session JSONL, no OTEL required.
-# User-authorized auto-install (2026-06-30) — see chassis CHANGELOG.
+# Pinned — a template installing unattended in other people's containers doesn't run "latest".
+CODEBURN_VERSION="0.9.15"
 if ! command -v codeburn >/dev/null 2>&1; then
-  echo "→ Installing codeburn …"
-  npm install -g codeburn --silent 2>/dev/null \
-    || echo "[warn] codeburn install failed (needs npm) — install manually: npm install -g codeburn"
+  echo "→ Installing codeburn v${CODEBURN_VERSION} …"
+  npm install -g "codeburn@${CODEBURN_VERSION}" --silent 2>/dev/null \
+    || echo "[warn] codeburn install failed (needs npm) — install manually: npm install -g codeburn@${CODEBURN_VERSION}"
 fi
 
 # ── abtop (live session monitor — bucket C) ───────────────────────────────────
-# User-authorized auto-install (2026-06-30) — see chassis CHANGELOG.
+# Pinned to a specific release's own installer (not releases/latest/) — the installer
+# fetches that version's prebuilt binary and verifies its checksum. abtop only reads
+# local files and process metadata; the one exception is its optional session summaries,
+# which shell out to `claude --print` (a real API call).
+ABTOP_VERSION="0.5.3"
 if ! command -v abtop >/dev/null 2>&1; then
-  echo "→ Installing abtop …"
+  echo "→ Installing abtop v${ABTOP_VERSION} …"
   curl --proto '=https' --tlsv1.2 -LsSf \
-    https://github.com/graykode/abtop/releases/latest/download/abtop-installer.sh \
+    "https://github.com/graykode/abtop/releases/download/v${ABTOP_VERSION}/abtop-installer.sh" \
     2>/dev/null | sh 2>/dev/null \
-    || echo "[warn] abtop install failed — install manually: cargo install abtop"
+    || echo "[warn] abtop install failed — install manually from https://github.com/graykode/abtop/releases"
 fi
 
 # ── AI Engineer Coach (VS Code dashboard — anti-patterns, practice score) ─────
-# https://github.com/microsoft/ai-engineering-coach (3.1k★, MIT). No marketplace build —
-# build from source. Harness support documents GitHub Copilot; Claude Code session-log
-# support is unconfirmed — verify after install. User-authorized unattended build
-# (2026-06-30) despite running this repo's own npm lifecycle/build scripts.
-if command -v code >/dev/null 2>&1 \
+# https://github.com/microsoft/ai-engineering-coach (MIT). Opt-in (install_ai_coach in
+# copier.yml, default false) and off by default for two reasons: it publishes no release,
+# so this is a git clone + `npm ci` + build of upstream source (a supply-chain surface a
+# template shouldn't run unattended in strangers' containers), and its harness docs cover
+# GitHub Copilot — Claude Code session-log support is unconfirmed. When enabled, the clone
+# is pinned to a specific commit. Chassis's own repo has no .copier-answers.yml, so the
+# grep is false here and the block stays off for chassis too.
+AEC_COMMIT="81d8eb2d76ef7f538f9c23ef0d950c1985e3270e"
+if grep -q '^install_ai_coach: true' .copier-answers.yml 2>/dev/null \
+   && command -v code >/dev/null 2>&1 \
    && ! code --list-extensions 2>/dev/null | grep -qi "ai-engineer-coach"; then
-  echo "→ Building AI Engineer Coach (clone + npm ci + package — this takes a minute) …"
+  echo "→ Building AI Engineer Coach @ ${AEC_COMMIT:0:12} (clone + npm ci + package — this takes a minute) …"
   AEC_DIR="$HOME/.local/share/ai-engineering-coach"
   if [ ! -d "$AEC_DIR" ]; then
-    git clone --depth 1 https://github.com/microsoft/ai-engineering-coach.git "$AEC_DIR" 2>/dev/null
+    git clone --filter=blob:none https://github.com/microsoft/ai-engineering-coach.git "$AEC_DIR" 2>/dev/null \
+      && git -C "$AEC_DIR" checkout "$AEC_COMMIT" 2>/dev/null
   fi
   if [ -d "$AEC_DIR" ]; then
     (
@@ -129,24 +140,52 @@ fi
 # https://github.com/Graphify-Labs/graphify. Local-first tree-sitter parsing + assistant-
 # driven semantic extraction into graph.json/graph.html/GRAPH_REPORT.md. Installs as a uv
 # tool + multi-assistant skill (`/graphify` in Claude Code and 15+ other assistants).
-# User-authorized auto-install (2026-07-08) — see chassis CHANGELOG.
+# The PyPI distribution is `graphifyy` (double-y — the project's own name); the CLI it
+# installs is `graphify`. Pinned.
+GRAPHIFY_VERSION="0.9.14"
 if command -v uv >/dev/null 2>&1 && ! command -v graphify >/dev/null 2>&1; then
-  echo "→ Installing graphify …"
-  uv tool install graphifyy --quiet 2>/dev/null \
+  echo "→ Installing graphify v${GRAPHIFY_VERSION} …"
+  uv tool install "graphifyy==${GRAPHIFY_VERSION}" --quiet 2>/dev/null \
     && graphify install >/dev/null 2>&1 \
-    || echo "[warn] graphify install failed — install manually: uv tool install graphifyy && graphify install"
+    || echo "[warn] graphify install failed — install manually: uv tool install graphifyy==${GRAPHIFY_VERSION} && graphify install"
 fi
 
 # ── ctx (cross-session agent history search — bucket C) ───────────────────────
 # https://github.com/ctxrs/ctx. Indexes local coding-agent session history into SQLite;
 # `ctx search "…"` retrieves prior decisions/failed attempts across sessions instead of
-# repeating work. Official installer fetches a prebuilt binary — no Rust toolchain needed
-# (building from source requires rust-version 1.81+, heavier than this slot warrants).
-# User-authorized auto-install (2026-07-08) — see chassis CHANGELOG.
+# repeating work. Pinned to a specific release's prebuilt binary + SHA-256 verification,
+# rather than piping the unpinned https://ctx.rs/install script through sh — this template
+# runs unattended in other people's containers, so it fetches a known artifact and checks
+# it. ctx is young and releases fast (multiple a week); bump CTX_VERSION deliberately.
+CTX_VERSION="0.24.0"
 if ! command -v ctx >/dev/null 2>&1; then
-  echo "→ Installing ctx …"
-  curl --proto '=https' --tlsv1.2 -fsSL https://ctx.rs/install | sh 2>/dev/null \
-    || echo "[warn] ctx install failed — install manually: curl -fsSL https://ctx.rs/install | sh"
+  echo "→ Installing ctx v${CTX_VERSION} …"
+  case "$(uname -s)-$(uname -m)" in
+    Linux-x86_64)             CTX_ASSET="ctx-linux-x64" ;;
+    Linux-aarch64|Linux-arm64) CTX_ASSET="ctx-linux-aarch64" ;;
+    Darwin-arm64)             CTX_ASSET="ctx-macos-arm64" ;;
+    Darwin-x86_64)            CTX_ASSET="ctx-macos-x64" ;;
+    *)                        CTX_ASSET="" ;;
+  esac
+  if [ -n "$CTX_ASSET" ]; then
+    CTX_TMP=$(mktemp -d)
+    CTX_BASE="https://github.com/ctxrs/ctx/releases/download/v${CTX_VERSION}"
+    CTX_OK=""
+    if curl --proto '=https' --tlsv1.2 -fsSL "$CTX_BASE/$CTX_ASSET" -o "$CTX_TMP/ctx" \
+       && curl --proto '=https' --tlsv1.2 -fsSL "$CTX_BASE/SHA256SUMS" -o "$CTX_TMP/SHA256SUMS"; then
+      CTX_WANT=$(grep " ${CTX_ASSET}\$" "$CTX_TMP/SHA256SUMS" | awk '{print $1}')
+      CTX_GOT=$(sha256sum "$CTX_TMP/ctx" | awk '{print $1}')
+      [ -n "$CTX_WANT" ] && [ "$CTX_WANT" = "$CTX_GOT" ] && CTX_OK=1
+    fi
+    if [ -n "$CTX_OK" ]; then
+      chmod +x "$CTX_TMP/ctx" && mv "$CTX_TMP/ctx" "$HOME/.local/bin/ctx"
+    else
+      echo "[warn] ctx download/checksum failed — install manually from https://github.com/ctxrs/ctx/releases"
+    fi
+    rm -rf "$CTX_TMP"
+  else
+    echo "[warn] no prebuilt ctx asset for $(uname -s)-$(uname -m) — install manually from https://github.com/ctxrs/ctx/releases"
+  fi
 fi
 if command -v ctx >/dev/null 2>&1; then
   ctx setup >/dev/null 2>&1 || true
