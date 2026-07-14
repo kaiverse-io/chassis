@@ -16,7 +16,10 @@ last_reviewed: 2026-07-08
 > `~/.claude/settings.json` (one project's rebuild or even an ordinary session start could
 > silently block every other stamped project's live session), via undocumented default
 > behavior in an unpinned upstream dependency. The other bucket-C tools (codeburn, abtop,
-> AI Engineer Coach, graphify, ctx) are unaffected and remain in place.
+> AI Engineer Coach, graphify, ctx) are unaffected and remain in place. The general rule this
+> generalizes to — no silent rewriters in the agent's read path — is
+> [ADR-004](adr-004-no-silent-rewriters.md); the mount-level root cause is
+> [ADR-003](adr-003-settings-json-isolation.md).
 
 > For the plain-language version of this decision — what each tool does, how the loop works,
 > why it's language-agnostic, and how to extend it — see
