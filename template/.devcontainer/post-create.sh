@@ -51,6 +51,7 @@ fi
 # ── gitleaks (secret scanning) ────────────────────────────────────────────────
 if ! command -v gitleaks >/dev/null 2>&1; then
   echo "→ Installing gitleaks …"
+  # renovate: datasource=github-releases depName=gitleaks/gitleaks extractVersion=^v(?<version>.*)$
   GITLEAKS_VERSION="8.21.2"
   ARCH=$(uname -m)
   case "$ARCH" in arm64|aarch64) GA="arm64" ;; *) GA="x64" ;; esac
@@ -82,6 +83,7 @@ fi
 # ── codeburn (AI usage cost/burn cockpit — bucket C) ──────────────────────────
 # Local-first: reads Claude Code's own session JSONL, no OTEL required.
 # Pinned — a template installing unattended in other people's containers doesn't run "latest".
+# renovate: datasource=npm depName=codeburn
 CODEBURN_VERSION="0.9.15"
 if ! command -v codeburn >/dev/null 2>&1; then
   echo "→ Installing codeburn v${CODEBURN_VERSION} …"
@@ -94,6 +96,7 @@ fi
 # fetches that version's prebuilt binary and verifies its checksum. abtop only reads
 # local files and process metadata; the one exception is its optional session summaries,
 # which shell out to `claude --print` (a real API call).
+# renovate: datasource=github-releases depName=graykode/abtop extractVersion=^v(?<version>.*)$
 ABTOP_VERSION="0.5.3"
 if ! command -v abtop >/dev/null 2>&1; then
   echo "→ Installing abtop v${ABTOP_VERSION} …"
@@ -142,6 +145,7 @@ fi
 # tool + multi-assistant skill (`/graphify` in Claude Code and 15+ other assistants).
 # The PyPI distribution is `graphifyy` (double-y — the project's own name); the CLI it
 # installs is `graphify`. Pinned.
+# renovate: datasource=pypi depName=graphifyy
 GRAPHIFY_VERSION="0.9.14"
 if command -v uv >/dev/null 2>&1 && ! command -v graphify >/dev/null 2>&1; then
   echo "→ Installing graphify v${GRAPHIFY_VERSION} …"
@@ -157,6 +161,7 @@ fi
 # rather than piping the unpinned https://ctx.rs/install script through sh — this template
 # runs unattended in other people's containers, so it fetches a known artifact and checks
 # it. ctx is young and releases fast (multiple a week); bump CTX_VERSION deliberately.
+# renovate: datasource=github-releases depName=ctxrs/ctx extractVersion=^v(?<version>.*)$
 CTX_VERSION="0.24.0"
 if ! command -v ctx >/dev/null 2>&1; then
   echo "→ Installing ctx v${CTX_VERSION} …"

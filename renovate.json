@@ -1,0 +1,25 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "description": "SHA-pin GitHub Actions (OpenSSF Scorecard Pinned-Dependencies) and keep the digest current",
+      "matchManagers": ["github-actions"],
+      "pinDigests": true
+    }
+  ],
+  "customManagers": [
+    {
+      "description": "Version pins in shell scripts, marked by a `# renovate: datasource=... depName=...` comment on the line above the `SOMETHING_VERSION=\"x.y.z\"` assignment. Covers gitleaks/codeburn/abtop/graphify/ctx in template/.devcontainer/post-create.sh and just in .github/workflows/ci.yml.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^template/\\.devcontainer/post-create\\.sh$/",
+        "/^\\.github/workflows/ci\\.yml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>\\S+?)(?: extractVersion=(?<extractVersion>\\S+?))?\\s+\\w+_VERSION=\"(?<currentValue>[^\"]+)\""
+      ]
+    }
+  ]
+}

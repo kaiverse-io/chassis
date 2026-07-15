@@ -82,6 +82,29 @@ Checklist:
    git describe --tags      # should print exactly vX.Y.Z with no -N-gHASH suffix when HEAD is the tag
    ```
 
+## Keeping pinned versions current
+
+Every third-party install in `template/.devcontainer/post-create.sh`, the GitHub Actions in
+`.github/workflows/ci.yml`, and the `just` binary CI installs are version-pinned — a template
+running unattended in strangers' containers doesn't install "latest" (ADR-004). Pinning without
+an update process just becomes silent staleness, so [Renovate](https://github.com/apps/renovate)
+(free for public repos) is configured in `renovate.json` to open a PR whenever any of these move:
+
+- **GitHub Actions** are pinned to a commit SHA with a `# vX` comment
+  ([OpenSSF Scorecard](https://scorecard.dev/)'s Pinned-Dependencies convention); Renovate keeps
+  the SHA current via `pinDigests`.
+- **Shell-variable pins** (`GITLEAKS_VERSION`, `CODEBURN_VERSION`, `ABTOP_VERSION`,
+  `GRAPHIFY_VERSION`, `CTX_VERSION`, `JUST_VERSION`) are matched by a custom regex manager, keyed
+  off the `# renovate: datasource=... depName=...` comment directly above each assignment — add
+  that same comment above any new pinned variable and Renovate picks it up automatically.
+- The **AI Engineer Coach commit pin** (`AEC_COMMIT`) is intentionally *not* Renovate-managed —
+  it tracks upstream `main` with no releases, so bumping it is a deliberate, manual act (verify
+  what changed before moving the pin), not something to rubber-stamp via an automated PR.
+
+Every Renovate PR still has to pass `just ci` + `just accept` + the devcontainer build before
+merge — pinning + automation doesn't mean unattended merges, it means the *proposal* to update
+is automatic and the *validation* stays exactly as strict as a hand-authored change.
+
 ### Versioning
 
 SemVer, pre-1.0 (`0.x.y`) while the template is still finding its shape. Treat a minor bump

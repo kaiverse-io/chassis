@@ -24,10 +24,10 @@ jobs:
     name: just ci + just accept
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
 
       - name: Install just and copier
         run: |
@@ -36,6 +36,7 @@ jobs:
           # runner and would flake a release run (chassis's own ADR-004 preference:
           # a pinned release asset over a piped install script). --retry rides out
           # transient GitHub blips too.
+          # renovate: datasource=github-releases depName=casey/just extractVersion=^(?<version>.*)$
           JUST_VERSION="1.56.0"
           mkdir -p "$HOME/.local/bin"
           curl --proto '=https' --tlsv1.2 -fsSL --retry 5 --retry-all-errors \
@@ -54,9 +55,9 @@ jobs:
     name: devcontainer build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "22"
 
