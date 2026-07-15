@@ -1,7 +1,7 @@
 ---
 kind: explanation
 status: active
-last_reviewed: 2026-07-13
+last_reviewed: 2026-07-15
 ---
 
 # Chassis design: the two planes, the buckets, and the layers
@@ -9,6 +9,24 @@ last_reviewed: 2026-07-13
 This is the "why does chassis exist and why is it shaped this way" document. It merges three
 questions that are answered separately everywhere else in the repo: what problem chassis solves,
 *how strict* each piece is (the bucket axis), and *what each piece is for* (the layer axis).
+
+## Principles
+
+The tenets behind every decision below, stated once so a reader doesn't have to reconstruct them
+from four documents. Each links to the section or ADR that earns it.
+
+| Principle | Means | Earned in |
+|---|---|---|
+| **Determinism wraps non-determinism** | Agent output isn't deterministic; Governance/Guardrails/Ratchet exist to check it with things that are | [Determinism is the point of the Foundation group](#determinism-is-the-point-of-the-foundation-group) |
+| **Observe, advise, or gate — never intercept** | A cockpit tool may read after the fact, answer when asked, or block loudly — never silently rewrite what the agent perceives | [The harness plane](#the-harness-plane-what-chassis-will-and-wont-put-between-an-agent-and-its-context), [ADR-004](../decisions/adrs/adr-004-no-silent-rewriters.md) |
+| **Reduce the need to read, don't compress the symptom** | Token frugality comes from structure/recall/memory tools and native platform features, not from filtering what the agent sees | [The harness plane](#the-harness-plane-what-chassis-will-and-wont-put-between-an-agent-and-its-context) |
+| **Two planes, one job** | Chassis is Plane 1 (how the software gets built) only; Plane 2 (what it does once shipped) is the product's own architecture, never chassis's | [The two planes](#the-two-planes) |
+| **Own your prompts, own your context window** | Of 12-factor-agents' twelve factors, only F2 and F3 describe *any* agent's behavior — including the one building this repo — so they're the only two chassis claims | [The two planes](#the-two-planes) |
+| **Curated is not exhaustive** | Memory is small and deliberate (a human decided this mattered); Context Engineering is large and automatic (indexes everything, judges nothing) — conflating them breaks both | [Memory vs. Context Engineering](#memory-vs-context-engineering-curated-vs-exhaustive) |
+| **One canonical copy, thin adapters** | Content lives once, harness-agnostic; a symlink adapts it to whatever tool currently expects it — swap the harness, not the content | [Tools/Skills](#toolsskills-the-same-portability-pattern-twice) |
+| **Compounding, not one-time** | A stamped project keeps receiving chassis's improvements via `copier update`; a one-time template copy doesn't | [The problem](#the-problem) |
+| **Thin by discipline** | The forcing function is `just accept` under ~2 minutes — the minimum that makes a project *start right*, not a superset that makes it *start slow* | [The thin-chassis discipline](#the-thin-chassis-discipline) |
+| **Generic only, nothing project-specific** | No consuming project's name or rule ever ships here — a project's own needs go in its own slots | [CONTRIBUTING.md](../../CONTRIBUTING.md#ground-rules) |
 
 ## The problem
 

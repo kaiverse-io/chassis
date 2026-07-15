@@ -71,8 +71,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md#releasing-a-version) for the release proce
 
 ## Docs
 
-- [Design](docs/explanation/design.md) — the problem, the two-plane model, the A/B/C/D
-  buckets, the ten capability layers, and the thin-chassis discipline. Start here for
+- [Design](docs/explanation/design.md) — the ten guiding principles, the two-plane model, the
+  A/B/C/D buckets, the ten capability layers, and the thin-chassis discipline. Start here for
   "why does this piece exist."
 - [AI-usage cockpit](docs/explanation/ai-usage-cockpit.md) — what the five bucket-C tools do,
   how they close the loop back into `AGENTS.md`, and how to add a sixth.
