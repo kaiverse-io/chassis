@@ -9,7 +9,7 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
-## [Unreleased]
+## [0.8.5] — 2026-07-15
 
 ### Fixed
 
