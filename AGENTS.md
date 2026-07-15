@@ -66,11 +66,15 @@ A bugfix to any of these fixes chassis's own devcontainer and every future stamp
 simultaneously — there is no second copy to remember.
 
 **`.devcontainer/devcontainer.json` and `docker-compose.yml` are deliberately *not* symlinked or
-generated from the template** — they mount just this repo's own root
-(`..:/workspaces/chassis:cached`), not the template's sibling-project convention
-(`../..:/workspaces:cached`, which assumes a shared parent folder with other projects in it).
-That's a permanent, correct difference, not drift to reconcile — a standalone clone has no
-sibling to see, and mounting one anyway would expose whatever else happens to live next to it.
+generated from the template** — they're the concrete instantiation, not a `.jinja` file needing
+Copier's rendering step (`project_name`, `include_ts`, …). Both chassis's own files and the
+template now mount only their own project root
+(`..:/workspaces/${localWorkspaceFolderBasename}:cached`) — never a shared parent folder — so a
+stamped project's container can't reach a sibling project's files, the same isolation concern
+[ADR-003](docs/decisions/adrs/adr-003-settings-json-isolation.md) fixes for `settings.json`. The
+template mounted a shared `/workspaces` parent (`../..:/workspaces:cached`) prior to 2026-07-15;
+that convention assumed a multi-project sibling folder and was dropped once it was flagged as the
+same class of cross-project leak.
 
 **`.agents/memory/MEMORY.md` is independent, not a symlink** — it holds chassis's own real,
 accumulated memory over time, the same way any stamped project's memory diverges immediately

@@ -9,6 +9,18 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- `template/.devcontainer/docker-compose.yml.jinja` mounted a shared `../..:/workspaces:cached`
+  parent folder, meaning every stamped project's container could see and reach whatever other
+  projects happened to be cloned alongside it — the same class of cross-project leak
+  [ADR-003](docs/decisions/adrs/adr-003-settings-json-isolation.md) fixes for `settings.json`.
+  Stamped projects now mount only their own root
+  (`..:/workspaces/${localWorkspaceFolderBasename}:cached`), matching chassis's own devcontainer
+  and `devcontainer.json.jinja`'s existing `workspaceFolder`.
+
 ## [0.8.4] — 2026-07-15
 
 ### Fixed
