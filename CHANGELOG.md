@@ -9,6 +9,16 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
+## [0.8.4] — 2026-07-15
+
+### Fixed
+
+- `template/.gitignore.jinja` was missing the `.devcontainer/devcontainer-lock.json` rule that
+  chassis's own root `.gitignore` has had all along — every stamped project was one `git add -A`
+  away from committing a devcontainer-CLI-generated snapshot that goes stale the moment
+  `devcontainer.json`'s features change. Found by inspection, not by a failure; verified against
+  a fresh stamp.
+
 ## [0.8.3] — 2026-07-15
 
 ### Added
