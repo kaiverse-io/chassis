@@ -9,6 +9,16 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
+## [0.8.3] — 2026-07-15
+
+### Added
+
+- A **Principles** section at the top of `docs/explanation/design.md`: ten tenets (determinism
+  wraps non-determinism, observe/advise/gate-never-intercept, two planes, own-your-prompts/
+  context-window, curated-vs-exhaustive memory, canonical-copy-thin-adapters, compounding not
+  one-time, thin by discipline, generic only) stated once with a link to where each is earned,
+  instead of only being derivable by reading the full doc plus ADR-004.
+
 ## [0.8.2] — 2026-07-15
 
 ### Fixed
