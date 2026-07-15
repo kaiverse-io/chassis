@@ -9,6 +9,25 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
+## [0.8.2] — 2026-07-15
+
+### Fixed
+
+- CI's `gates` job piped `just.systems/install.sh` through bash and hit a transient 403 on a
+  real release run (the v0.8.0 tag build failed while the same commit's `main` build passed
+  seconds earlier). `just` is now installed from a pinned GitHub release binary with retries.
+- GitHub Actions in `.github/workflows/ci.yml` are now pinned to a commit SHA (with a `# vX`
+  comment), not a mutable tag — [OpenSSF Scorecard](https://scorecard.dev/)'s
+  Pinned-Dependencies convention.
+
+### Added
+
+- [Renovate](https://github.com/apps/renovate) config (`renovate.json`, free for public repos):
+  auto-pins/updates GitHub Action digests, and a custom regex manager keeps every shell-variable
+  version pin (gitleaks/codeburn/abtop/graphify/ctx/just) current via a
+  `# renovate: datasource=... depName=...` marker comment above each. Documented in
+  `CONTRIBUTING.md` "Keeping pinned versions current".
+
 ## [0.8.1] — 2026-07-14
 
 ### Fixed
