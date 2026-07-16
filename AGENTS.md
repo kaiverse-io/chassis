@@ -68,8 +68,10 @@ simultaneously — there is no second copy to remember.
 **`.devcontainer/devcontainer.json` and `docker-compose.yml` are deliberately *not* symlinked or
 generated from the template** — they're the concrete instantiation, not a `.jinja` file needing
 Copier's rendering step (`project_name`, `include_ts`, …). Both chassis's own files and the
-template now mount only their own project root
-(`..:/workspaces/${localWorkspaceFolderBasename}:cached`) — never a shared parent folder — so a
+template now mount only their own project root, at a hardcoded literal path
+(`..:/workspaces/<project>:cached` — `${localWorkspaceFolderBasename}` cannot be used there:
+it's substituted only in devcontainer.json, and Docker Compose resolves it as an unset env var,
+i.e. empty) — never a shared parent folder — so a
 stamped project's container can't reach a sibling project's files, the same isolation concern
 [ADR-003](docs/decisions/adrs/adr-003-settings-json-isolation.md) fixes for `settings.json`. The
 template mounted a shared `/workspaces` parent (`../..:/workspaces:cached`) prior to 2026-07-15;

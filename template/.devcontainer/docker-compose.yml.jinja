@@ -10,10 +10,12 @@ services:
       # Mounts just this project's own root, not a shared parent folder — a sibling
       # project mounted alongside it would be reachable from inside this container
       # with no isolation, the same class of leak ADR-003 fixes for settings.json.
-      # ${localWorkspaceFolderBasename} (devcontainer-CLI variable substitution,
-      # not a shell/Jinja variable) keeps this working regardless of what the
-      # clone directory is actually named, matching workspaceFolder below.
-      - ..:/workspaces/${localWorkspaceFolderBasename}:cached
+      # Hardcoded literal, matching workspaceFolder in devcontainer.json. It can't be
+      # ${localWorkspaceFolderBasename}: that variable is substituted only in
+      # devcontainer.json — Docker Compose resolves ${...} from its own environment,
+      # where it's unset, so it silently becomes "" and the workspace mounts at bare
+      # /workspaces while VS Code opens /workspaces/<name> ("workspace doesn't exist").
+      - ..:/workspaces/{{ python_package_name }}:cached
       # Layer 3 — cache volumes (fast rebuilds, never committed)
       - uv-cache:/home/vscode/.cache/uv
       - precommit-cache:/home/vscode/.cache/pre-commit{% if include_ts %}

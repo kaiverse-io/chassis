@@ -2,7 +2,9 @@
   "name": "{{ project_name }}",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
-  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  // Literal, matching the workspace volume in docker-compose.yml — compose can't
+  // substitute ${localWorkspaceFolderBasename}, so both sides hardcode the name.
+  "workspaceFolder": "/workspaces/{{ python_package_name }}",
 
   // ── Features (pinned — no "lts") ─────────────────────────────────────────
   "features": {

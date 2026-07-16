@@ -9,6 +9,20 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- v0.8.5's own-root workspace mount never worked: it used
+  `..:/workspaces/${localWorkspaceFolderBasename}:cached` in
+  `template/.devcontainer/docker-compose.yml.jinja`, but that variable is substituted only in
+  `devcontainer.json` — Docker Compose resolves `${...}` from its environment, where it's unset,
+  so the workspace silently mounted at bare `/workspaces` while VS Code opened
+  `/workspaces/<name>`, failing every stamped project's container open with "workspace doesn't
+  exist". Both the compose mount and `devcontainer.json.jinja`'s `workspaceFolder` are now a
+  hardcoded literal (`/workspaces/{{ python_package_name }}`), matching how chassis's own
+  devcontainer always did it.
+
 ## [0.8.5] — 2026-07-15
 
 ### Fixed

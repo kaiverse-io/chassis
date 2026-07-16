@@ -15,11 +15,14 @@ only its own repo root (`..:/workspaces/chassis:cached`) — a difference the re
 to describe as a *permanent, intentional* divergence rather than drift.
 
 **Fixed**: the user asked to close this gap. The template now mounts only the project's own root
-too: `..:/workspaces/${localWorkspaceFolderBasename}:cached`, matching the `workspaceFolder` value
-`devcontainer.json.jinja` already used. `${localWorkspaceFolderBasename}` is a devcontainer-CLI
-substitution variable (resolved by the CLI when it reads the compose file via
-`dockerComposeFile`), not a shell or Jinja variable — it keeps the mount correct regardless of
-what the clone directory is actually named.
+too, at a hardcoded literal path: `..:/workspaces/{{ python_package_name }}:cached`, with
+`devcontainer.json.jinja`'s `workspaceFolder` hardcoded to match. The first version of this fix
+(v0.8.5) used `..:/workspaces/${localWorkspaceFolderBasename}:cached` instead — that was wrong:
+`${localWorkspaceFolderBasename}` is substituted **only in devcontainer.json**; Docker Compose
+resolves `${...}` from its own environment, where the variable is unset, so it silently became
+`""`. The workspace mounted at bare `/workspaces` while VS Code opened `/workspaces/<name>`,
+failing with "workspace doesn't exist" on every stamped project (hit in aither, 2026-07-15;
+fixed in v0.8.6).
 
 **Why**: the shared-parent mount was the same class of cross-project information leak that
 [[devcontainer-settings-json-isolation]] (ADR-003) fixes for `~/.claude/settings.json` — a
