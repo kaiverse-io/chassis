@@ -6,7 +6,12 @@
 
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/devcontainers/features/node:1": { "version": "22" }
+    "ghcr.io/devcontainers/features/node:1": { "version": "22" },
+    // Docker-outside-of-docker, enabled by default — see
+    // template/.devcontainer/devcontainer.json.jinja (enable_docker_outside_of_docker)
+    // for the full rationale. `moby: false` avoids a known apt-repo network failure —
+    // see agent memory devcontainer-docker-outside-of-docker-moby.md.
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": { "moby": false }
   },
 
   // Generate the shadow settings.json (mounted below) as `{}` before the container
@@ -27,7 +32,9 @@
     "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude.json,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached,readonly",
     "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached,readonly",
-    "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached,readonly"
+    "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached,readonly",
+    // Docker socket (pairs with the docker-outside-of-docker feature above).
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
   ],
 
   "remoteUser": "vscode",

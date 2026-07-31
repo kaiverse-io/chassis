@@ -9,6 +9,17 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
+## [0.9.0] — 2026-07-31
+
+### Added
+
+- `enable_docker_outside_of_docker` copier variable (default `true`): the
+  docker-outside-of-docker feature + host `docker.sock` mount is now included in every
+  stamped project's `devcontainer.json` by default, instead of a comment-only recipe a
+  project had to hand-copy in. Turn it off at stamp time for a no-host-Docker
+  remote/cloud devcontainer. Chassis's own root `.devcontainer/devcontainer.json` mirrors
+  the same default.
+
 ## [0.8.6] — 2026-07-16
 
 ### Fixed

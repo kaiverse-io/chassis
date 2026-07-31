@@ -36,6 +36,11 @@ install_ai_coach:
   help: "Install AI Engineer Coach? Opt-in — it publishes no release, so enabling it builds a VS Code extension from upstream source (git clone + npm ci, pinned to a commit), and its Claude Code session-log support is unconfirmed."
   default: false
 
+enable_docker_outside_of_docker:
+  type: bool
+  help: "Enable docker-outside-of-docker (forwards the host's docker.sock, for projects whose docker-compose.yml boots services beyond `app`)? Only works when the host itself runs Docker — turn off for a no-host-Docker remote/cloud devcontainer."
+  default: true
+
 author_name:
   type: str
   help: "Author name"
