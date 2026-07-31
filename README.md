@@ -19,10 +19,10 @@ bucket model:
 
 | Bucket | Behavior | What's in it |
 |---|---|---|
-| **A — Guardrails** | Blocks the commit or CI run. For things where "wrong" is always wrong. | `AGENTS.md`, ruff+mypy, import-linter boundary slot, opengrep self-weakening + prompts-as-code rules, gitleaks, conventional commits, CODEOWNERS, Diátaxis docs, `prompts/` convention, a 4-layer devcontainer |
+| **A — Guardrails** | Blocks the commit or CI run. For things where "wrong" is always wrong. | `AGENTS.md`, ruff+mypy, import-linter boundary slot, opengrep self-weakening + prompts-as-code rules, gitleaks, conventional commits, CODEOWNERS, Diátaxis docs, `prompts/` convention, `ARCHITECTURE.md` coverage gate (`just ci-arch`), a 4-layer devcontainer |
 | **B — Ratcheting** | Present from day one; the threshold only ever increases. | Coverage floor (start at 0%, raise as you write tests), complexity ceiling |
-| **C — On-demand** | Installed automatically, never blocks anything — run it when it's useful. | The [AI-usage cockpit](docs/explanation/ai-usage-cockpit.md): `codeburn`, `abtop`, AI Engineer Coach, `graphify`, `ctx` |
-| **D — Wired-but-waiting** | The slot exists in CI/config from day one but is a deliberate no-op until its input exists. | `evals/` (eval gate), ADLC agent-change gate, arch-drift slot |
+| **C — On-demand** | Installed automatically, never blocks anything — run it when it's useful. | The [AI-usage cockpit](docs/explanation/ai-usage-cockpit.md): `codeburn`, `abtop`, AI Engineer Coach, `graphify`, `ctx`; the `/arch-review` skill (architecture-doc accuracy) |
+| **D — Wired-but-waiting** | The slot exists in CI/config from day one but is a deliberate no-op until its input exists. | `evals/` (eval gate), ADLC agent-change gate |
 
 The cockpit is the piece worth calling out: five tools that turn "working with a coding agent"
 into something with a feedback loop. `ctx` indexes full session history so corrections don't

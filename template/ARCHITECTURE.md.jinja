@@ -1,0 +1,41 @@
+# {{ project_name }} Architecture
+
+> Hand-maintained, not generated. `just ci-arch` fails CI if a top-level module/package under
+> `src/{{ python_package_name }}/` has no matching section here — see `AGENTS.md` "Architecture
+> documentation". Diagrams are plain ASCII/Unicode box-drawing text in an untagged fenced code
+> block, not Mermaid — a diagram you can update in the same PR as the code, not a separate
+> rendering step.
+
+## Executive Summary
+
+<!-- One paragraph: what this project does, and the one or two design decisions that shape
+     everything else (the thing a new contributor most needs to know before reading any code). -->
+
+{{ description }}
+
+## System Overview
+
+```
+<!-- Redraw this whenever a top-level component is added, removed, or its role changes.
+     Boxes for each component + external dependency (database, queue, third-party API),
+     arrows for the actual data/control flow between them. -->
+```
+
+## Components
+
+Each top-level module or package directly under `src/{{ python_package_name }}/` gets a `##`
+section below: what it's for, its public interface, what it depends on, and — if its internal
+flow isn't obvious from the name — a small ASCII diagram. `just ci-arch` only checks that the
+section exists (mechanical coverage); it does not verify the content still matches the code. Run
+the `/arch-review` skill (`.agents/skills/arch-review/SKILL.md`) periodically, or after a PR that
+changes a documented component's behavior, to catch drift a coverage check can't.
+
+<!-- ### <ModuleName>
+Purpose: …
+Depends on: …
+-->
+
+## Known Limitations
+
+<!-- Anything a reader would otherwise assume works but doesn't yet, or a shortcut taken
+     deliberately. Keep this current — remove an item the moment it's resolved. -->

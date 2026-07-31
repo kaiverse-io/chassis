@@ -95,8 +95,11 @@ Every tool is wired in from day one. What varies is *how it behaves*:
   canonical example: start at 0%, raise as you write tests, never lower.
 - **C (On-demand):** installed, never blocks. Run when useful. The AI-usage cockpit lives here.
 - **D (Wired-but-waiting):** the job/slot exists in CI and config from day one, but it's a no-op
-  until its input exists. The eval gate needs a model call; the arch-drift gate needs an
-  architecture model. The slot means the gate is trivially activatable — no retrofit.
+  until its input exists. The eval gate needs a model call; the ADLC agent-change gate needs
+  agent-affecting paths to actually change. The slot means the gate is trivially activatable —
+  no retrofit. (The former arch-drift slot needed an architecture model to check against — a
+  per-component `ARCHITECTURE.md` convention now supplies that, so it graduated to bucket A
+  (`just ci-arch`, coverage) plus bucket C (`/arch-review`, accuracy) instead of staying dormant.)
 
 ## The layer axis: what is it for
 
@@ -109,7 +112,7 @@ flowchart BT
         direction BT
         Substrate["<b>Substrate</b><br/>devcontainer: image → tools → cache volumes → host mounts"]
         Governance["<b>Governance</b> — bucket A (blocking)<br/>permissions.allow · Forbidden Patterns · ask-before-destructive"]
-        Guardrails["<b>Guardrails</b> — bucket A (blocking)<br/>ruff · mypy · import-linter · opengrep · gitleaks"]
+        Guardrails["<b>Guardrails</b> — bucket A (blocking)<br/>ruff · mypy · import-linter · opengrep · gitleaks · ARCHITECTURE.md coverage"]
         Prompts["<b>Prompts</b> — bucket A (blocking) · 12FA F2<br/>prompts/ convention, no-inline-literal rule"]
         Ratchet["<b>Ratchet</b> — bucket B (ratcheting)<br/>coverage floor · complexity ceiling"]
         Substrate --> Governance --> Guardrails --> Prompts --> Ratchet
@@ -120,12 +123,12 @@ flowchart BT
         Memory["<b>Memory</b> — bucket A (git-tracked)<br/>.agents/memory/ · curated, deliberate, durable"]
         Context["<b>Context Engineering</b> — bucket C (on-demand) · 12FA F3<br/>graphify · ctx · automatic, exhaustive"]
         Tools["<b>Tools/Skills</b> — bucket C (on-demand)<br/>.agents/skills/ · SKILL.md standard · canonical-then-adapt"]
-        Coaching["<b>Coaching</b> — bucket C (on-demand)<br/>dev-coach · AI Engineer Coach · codeburn · abtop"]
+        Coaching["<b>Coaching</b> — bucket C (on-demand)<br/>dev-coach · arch-review · AI Engineer Coach · codeburn · abtop"]
         Memory --> Context --> Tools --> Coaching
     end
 
     subgraph Readiness["Readiness — dormant until activated"]
-        ReadinessLayer["<b>Readiness</b> — bucket D (wired-waiting)<br/>evals/ · ADLC gate · arch-drift slot"]
+        ReadinessLayer["<b>Readiness</b> — bucket D (wired-waiting)<br/>evals/ · ADLC gate"]
     end
 
     Foundation --> Cockpit --> Readiness
@@ -140,14 +143,14 @@ flowchart BT
 |---|---|---|---|---|
 | **Substrate** | What does this even run on? | — | Devcontainer's 4-sub-layer model: image → toolchain → cache volumes → host mounts | — |
 | **Governance** | Is the *agent* allowed to take this action? | — | `permissions.allow`, `AGENTS.md` Forbidden Patterns, ask-before-destructive conventions | A |
-| **Guardrails** | Does the *code* meet the bar? | — | ruff, mypy, import-linter, opengrep self-weakening, gitleaks | A |
+| **Guardrails** | Does the *code* meet the bar? | — | ruff, mypy, import-linter, opengrep self-weakening, gitleaks, `ARCHITECTURE.md` coverage (`just ci-arch`) | A |
 | **Prompts** | Where do prompts live, how are they versioned? | F2 — Own your Prompts | `prompts/` convention; no inline literal over 200 chars | A |
 | **Ratchet** | What quality bar only ever goes up? | — | Coverage floor, complexity ceiling | B |
 | **Memory** | What did we deliberately choose to remember forever? | — (adjacent to F3, but curated not automatic) | `.agents/memory/` — git-tracked, one file per insight, `MEMORY.md` index | A (git-tracked) |
 | **Context Engineering** | How does the agent spend fewer tokens re-discovering what's already known? | F3 — Own your Context Window | `graphify` (structure), `ctx` (session recall) | C |
 | **Tools/Skills** | How do new capabilities get provisioned, portably? | — | `.agents/skills/` (SKILL.md open standard) + `.claude/skills` symlink — canonical-then-adapt | C |
-| **Coaching** | How does friction turn into a durable rule? | — (meta: F2/F3 applied reflexively) | `/dev-coach`, AI Engineer Coach, `codeburn`/`abtop` — consumes Memory + Context Engineering + Tools | C |
-| **Readiness** | What's provisioned now so it's trivial to activate later? | — | `evals/`, ADLC agent-change gate, arch-drift slot | D |
+| **Coaching** | How does friction turn into a durable rule? | — (meta: F2/F3 applied reflexively) | `/dev-coach`, `/arch-review`, AI Engineer Coach, `codeburn`/`abtop` — consumes Memory + Context Engineering + Tools | C |
+| **Readiness** | What's provisioned now so it's trivial to activate later? | — | `evals/`, ADLC agent-change gate | D |
 
 ### Determinism is the point of the Foundation group
 

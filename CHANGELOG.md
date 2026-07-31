@@ -9,6 +9,23 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
+## [0.10.0] — 2026-07-31
+
+### Added
+
+- Activated the former arch-drift bucket-D slot: every stamped project now gets a
+  hand-maintained `ARCHITECTURE.md` (one `##` section per top-level `src/<package>/`
+  component — purpose, dependencies, plain-ASCII diagram, no Mermaid) plus a mechanical
+  coverage gate (`just ci-arch`, wired into `just ci` and the CI workflow) that blocks CI
+  if a component has no matching section. Semantic accuracy (does the section still match
+  the code) is a separate concern, covered by the new `/arch-review` skill
+  (`.agents/skills/arch-review/SKILL.md`) — on-demand, not a hard gate, since drift
+  detection needs a read of the actual code, not a regex match.
+- `AGENTS.md` gained an "Architecture documentation" section instructing agents to add a
+  component's `ARCHITECTURE.md` section in the same PR that adds the component.
+- Reclassified in the bucket model: coverage moves from D (wired-but-waiting) to A
+  (blocking); the accuracy-review skill lives in C (on-demand) alongside `/dev-coach`.
+
 ## [0.9.0] — 2026-07-31
 
 ### Added

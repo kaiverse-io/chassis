@@ -17,11 +17,12 @@ last_reviewed: 2026-07-08
 `copier copy gh:km2411/chassis <dest> --trust` stamps a new project with:
 
 - Guardrails (A): AGENTS.md, ruff/mypy, import-linter boundary slot, opengrep self-weakening,
-  gitleaks, conventional commits, CODEOWNERS, Diátaxis docs, pre-commit.
+  gitleaks, conventional commits, CODEOWNERS, Diátaxis docs, pre-commit, `ARCHITECTURE.md`
+  coverage gate (`just ci-arch`).
 - Ratcheting gates (B): coverage floor (only-increase), complexity ceiling.
 - On-demand tools (C): the AI-usage cockpit — codeburn, abtop, AI Engineer Coach, graphify,
-  ctx.
-- Wired-but-waiting slots (D): eval gate, ADLC agent-change gate, arch-drift.
+  ctx; the `/arch-review` skill (architecture-doc accuracy).
+- Wired-but-waiting slots (D): eval gate, ADLC agent-change gate.
 
 See [docs/explanation/design.md](docs/explanation/design.md) for the full breakdown of *why*
 each piece exists — the two-plane model, the buckets, the ten capability layers, and the
