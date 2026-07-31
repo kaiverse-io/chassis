@@ -42,7 +42,8 @@ author_name:
 
 author_email:
   type: str
-  help: "Author email"
+  help: "Author email (leave blank to omit — GitHub commit authorship already carries attribution; only set this if the package needs a contact address, e.g. oss@example.com)"
+  default: ""
 
 github_owner:
   type: str

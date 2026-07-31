@@ -5,7 +5,11 @@ description = "{{ description }}"
 readme = "README.md"
 license = { text = "{{ license }}" }
 requires-python = ">={{ python_version }}"
+{% if author_email -%}
 authors = [{ name = "{{ author_name }}", email = "{{ author_email }}" }]
+{% else -%}
+authors = [{ name = "{{ author_name }}" }]
+{% endif -%}
 dependencies = []
 
 [build-system]
