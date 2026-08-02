@@ -154,3 +154,5 @@ project gets). One file per insight; `MEMORY.md` index (one line per entry).
 - Hardcoded secrets
 - Adding project-specific rules to the chassis template
 - Referencing a specific consuming project (e.g. by name) anywhere in this repo
+- `Co-authored-by` / `Co-Authored-By` trailers in commits — commits belong solely
+  to the GitHub credential owner that pushes
