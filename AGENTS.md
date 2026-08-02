@@ -20,7 +20,9 @@ last_reviewed: 2026-07-08
   gitleaks, conventional commits, CODEOWNERS, Diátaxis docs, pre-commit, `ARCHITECTURE.md`
   coverage gate (`just ci-arch`).
 - Ratcheting gates (B): coverage floor (only-increase; stamped via Copier
-  `coverage_fail_under`, enforced by `just ci-test`), complexity ceiling.
+  `coverage_fail_under` into both `fail_under` and `--cov-fail-under`; enforced by
+  `just ci-test`). On `copier update`, projects must carry their current answer so a
+  default of `0` cannot silently lower a raised floor. Complexity ceiling.
 - On-demand tools (C): the AI-usage cockpit — codeburn, abtop, AI Engineer Coach, graphify,
   ctx; the `/arch-review` skill (architecture-doc accuracy).
 - Wired-but-waiting slots (D): eval gate, ADLC agent-change gate.

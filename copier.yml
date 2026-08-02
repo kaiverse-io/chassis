@@ -28,7 +28,7 @@ python_version:
 
 coverage_fail_under:
   type: int
-  help: "Initial pytest-cov floor (0–100). Bucket B ratchet — stamp sets the starting value; raise it in the project as coverage grows, never lower it. CI enforces via just ci-test."
+  help: "Initial pytest-cov floor (0–100). Bucket B ratchet — stamp sets the starting value into both fail_under and --cov-fail-under; raise both as coverage grows, never lower. On copier update, answer with the project's current floor so a default of 0 cannot rewrite it. CI enforces via just ci-test."
   default: 0
   validator: "{% if coverage_fail_under < 0 or coverage_fail_under > 100 %}Must be an integer from 0 to 100{% endif %}"
 

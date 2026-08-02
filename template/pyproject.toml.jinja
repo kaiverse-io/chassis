@@ -56,5 +56,6 @@ branch = true
 
 [tool.coverage.report]
 # Ratchet (bucket B): only increase this value, never decrease it.
-# Initial value stamped from Copier answer coverage_fail_under; raise in-repo only.
+# Initial value stamped from Copier answer coverage_fail_under; raise both this
+# and --cov-fail-under in-repo together (never lower; keep the Copier answer in sync).
 fail_under = {{ coverage_fail_under }}

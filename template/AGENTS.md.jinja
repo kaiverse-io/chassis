@@ -113,7 +113,9 @@ loss across sessions and feeds the coaching loop (Factor 2/3 of 12-factor-agents
 - Inline prompt literals (200+ chars) — move to `prompts/` and load at runtime.
 - Bare `# noqa` or `# type: ignore` without a specific code and reason.
 - Hardcode secrets — use `.env` (gitignored) and `.env.example` as the template.
-- Lower the `fail_under` coverage floor.
+- Lower the coverage floor (`fail_under` or `--cov-fail-under`) — raise both together.
+  On `copier update`, keep `coverage_fail_under` in `.copier-answers.yml` at the current
+  floor so a default of `0` cannot silently rewrite a raised ratchet.
 - `continue-on-error: true` in CI to silence a failing step.
 - `pre-commit uninstall` — the hooks are the guardrails, not obstacles.
 - Commit to `main` without CI green.

@@ -17,7 +17,9 @@ changed, tersely. Anything longer is in git history or an ADR.
   bucket-B pytest-cov floor into **both** `[tool.coverage.report] fail_under` and pytest
   `--cov-fail-under` (kept identical on purpose). The cov target remains
   `python_package_name`. CI already enforces via `just ci-test` → `uv run pytest` — no
-  workflow change. After stamp, raise the floor in-repo only; never lower it. See
+  workflow change. After stamp, raise the floor in-repo only; never lower it. On
+  `copier update`, keep the answer at the project's current floor so a default `0`
+  cannot silently rewrite a raised ratchet. See
   [ADR-005](docs/decisions/adrs/adr-005-coverage-fail-under-stamp.md).
 - `just accept` now asserts the default stamp renders `0` in both sites and that a
   non-default `coverage_fail_under=42` stamp renders `42` in both (without running that
