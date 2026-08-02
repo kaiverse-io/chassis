@@ -20,7 +20,7 @@ bucket model:
 | Bucket | Behavior | What's in it |
 |---|---|---|
 | **A — Guardrails** | Blocks the commit or CI run. For things where "wrong" is always wrong. | `AGENTS.md`, ruff+mypy, import-linter boundary slot, opengrep self-weakening + prompts-as-code rules, gitleaks, conventional commits, CODEOWNERS, Diátaxis docs, `prompts/` convention, `ARCHITECTURE.md` coverage gate (`just ci-arch`), a 4-layer devcontainer |
-| **B — Ratcheting** | Present from day one; the threshold only ever increases. | Coverage floor (start at 0%, raise as you write tests), complexity ceiling |
+| **B — Ratcheting** | Present from day one; the threshold only ever increases. | Coverage floor (Copier answer `coverage_fail_under`, default 0% — raise as you write tests; CI enforces via pytest), complexity ceiling |
 | **C — On-demand** | Installed automatically, never blocks anything — run it when it's useful. | The [AI-usage cockpit](docs/explanation/ai-usage-cockpit.md): `codeburn`, `abtop`, AI Engineer Coach, `graphify`, `ctx`; the `/arch-review` skill (architecture-doc accuracy) |
 | **D — Wired-but-waiting** | The slot exists in CI/config from day one but is a deliberate no-op until its input exists. | `evals/` (eval gate), ADLC agent-change gate |
 

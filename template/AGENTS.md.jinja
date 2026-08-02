@@ -44,7 +44,10 @@ docs/decisions/adrs/             — MADR decision records
 - `just sync` after changing `pyproject.toml`.
 - Conventional commits enforced: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`.
 - All significant decisions → MADR ADR in `docs/decisions/adrs/` first.
-- Coverage ratchet: `fail_under` in `[tool.coverage.report]` — only ever increase it.
+- Coverage ratchet: `fail_under` in `[tool.coverage.report]` (and matching
+  `--cov-fail-under` in pytest `addopts`) — only ever increase it. Initial floor is
+  stamped from the Copier answer `coverage_fail_under` (per package via
+  `python_package_name` as the cov target); raise both values together after measuring.
 
 ## Architecture documentation
 

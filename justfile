@@ -31,6 +31,41 @@ accept:
         echo "FAIL: .copier-answers.yml was not generated — copier update would be broken for every stamped project"
         exit 1
     }
+    # Default coverage floor must stamp as 0 in BOTH enforcement sites (keep in sync).
+    grep -q -- '--cov-fail-under=0' "$tmpdir/pyproject.toml" || {
+        echo "FAIL: default stamp missing --cov-fail-under=0 in pytest addopts"
+        exit 1
+    }
+    grep -qE '^fail_under = 0$' "$tmpdir/pyproject.toml" || {
+        echo "FAIL: default stamp missing fail_under = 0 in [tool.coverage.report]"
+        exit 1
+    }
+    grep -q 'coverage_fail_under: 0' "$tmpdir/.copier-answers.yml" || {
+        echo "FAIL: .copier-answers.yml missing coverage_fail_under: 0"
+        exit 1
+    }
+    # Parameterization: a non-default floor must render into both sites (no full ci —
+    # a high floor would fail the smoke test; we only check the stamp).
+    tmpdir_floor=$(mktemp -d)
+    copier copy . "$tmpdir_floor" --vcs-ref=HEAD --defaults --trust \
+        --data "project_name=FloorProject" \
+        --data "python_package_name=floor_project" \
+        --data "description=Coverage floor stamp check" \
+        --data "author_name=Test" \
+        --data "author_email=test@example.com" \
+        --data "github_owner=km2411" \
+        --data "license=Proprietary" \
+        --data "coverage_fail_under=42" \
+        --overwrite --quiet
+    grep -q -- '--cov-fail-under=42' "$tmpdir_floor/pyproject.toml" || {
+        echo "FAIL: coverage_fail_under=42 did not render into --cov-fail-under"
+        exit 1
+    }
+    grep -qE '^fail_under = 42$' "$tmpdir_floor/pyproject.toml" || {
+        echo "FAIL: coverage_fail_under=42 did not render into fail_under"
+        exit 1
+    }
+    rm -rf "$tmpdir_floor"
     echo "Running just ci in stamped project …"
     cd "$tmpdir"
     just ci

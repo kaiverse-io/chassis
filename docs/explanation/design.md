@@ -145,7 +145,7 @@ flowchart BT
 | **Governance** | Is the *agent* allowed to take this action? | — | `permissions.allow`, `AGENTS.md` Forbidden Patterns, ask-before-destructive conventions | A |
 | **Guardrails** | Does the *code* meet the bar? | — | ruff, mypy, import-linter, opengrep self-weakening, gitleaks, `ARCHITECTURE.md` coverage (`just ci-arch`) | A |
 | **Prompts** | Where do prompts live, how are they versioned? | F2 — Own your Prompts | `prompts/` convention; no inline literal over 200 chars | A |
-| **Ratchet** | What quality bar only ever goes up? | — | Coverage floor, complexity ceiling | B |
+| **Ratchet** | What quality bar only ever goes up? | — | Coverage floor (`coverage_fail_under` Copier answer → `fail_under` + `--cov-fail-under`, CI via `just ci-test`), complexity ceiling | B |
 | **Memory** | What did we deliberately choose to remember forever? | — (adjacent to F3, but curated not automatic) | `.agents/memory/` — git-tracked, one file per insight, `MEMORY.md` index | A (git-tracked) |
 | **Context Engineering** | How does the agent spend fewer tokens re-discovering what's already known? | F3 — Own your Context Window | `graphify` (structure), `ctx` (session recall) | C |
 | **Tools/Skills** | How do new capabilities get provisioned, portably? | — | `.agents/skills/` (SKILL.md open standard) + `.claude/skills` symlink — canonical-then-adapt | C |

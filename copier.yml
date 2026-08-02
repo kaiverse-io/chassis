@@ -26,6 +26,12 @@ python_version:
   help: "Minimum Python version"
   default: "3.12"
 
+coverage_fail_under:
+  type: int
+  help: "Initial pytest-cov floor (0–100). Bucket B ratchet — stamp sets the starting value; raise it in the project as coverage grows, never lower it. CI enforces via just ci-test."
+  default: 0
+  validator: "{% if coverage_fail_under < 0 or coverage_fail_under > 100 %}Must be an integer from 0 to 100{% endif %}"
+
 include_ts:
   type: bool
   help: "Include TypeScript module? (opt-in)"

@@ -19,7 +19,8 @@ last_reviewed: 2026-07-08
 - Guardrails (A): AGENTS.md, ruff/mypy, import-linter boundary slot, opengrep self-weakening,
   gitleaks, conventional commits, CODEOWNERS, Diátaxis docs, pre-commit, `ARCHITECTURE.md`
   coverage gate (`just ci-arch`).
-- Ratcheting gates (B): coverage floor (only-increase), complexity ceiling.
+- Ratcheting gates (B): coverage floor (only-increase; stamped via Copier
+  `coverage_fail_under`, enforced by `just ci-test`), complexity ceiling.
 - On-demand tools (C): the AI-usage cockpit — codeburn, abtop, AI Engineer Coach, graphify,
   ctx; the `/arch-review` skill (architecture-doc accuracy).
 - Wired-but-waiting slots (D): eval gate, ADLC agent-change gate.
