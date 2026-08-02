@@ -46,7 +46,8 @@ testpaths = ["tests"]
 addopts = [
     "--cov={{ python_package_name }}",
     "--cov-report=term-missing",
-    "--cov-fail-under=0",
+    # Keep in sync with [tool.coverage.report] fail_under (same Copier answer).
+    "--cov-fail-under={{ coverage_fail_under }}",
 ]
 
 [tool.coverage.run]
@@ -55,4 +56,6 @@ branch = true
 
 [tool.coverage.report]
 # Ratchet (bucket B): only increase this value, never decrease it.
-fail_under = 0
+# Initial value stamped from Copier answer coverage_fail_under; raise both this
+# and --cov-fail-under in-repo together (never lower; keep the Copier answer in sync).
+fail_under = {{ coverage_fail_under }}

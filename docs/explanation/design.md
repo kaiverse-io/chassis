@@ -92,7 +92,9 @@ Every tool is wired in from day one. What varies is *how it behaves*:
 - **A (Blocking):** fails the commit or CI run. Used for things where "wrong" is always wrong —
   secret leaks, import boundary violations, self-weakening patterns.
 - **B (Ratcheting):** present from day one, threshold only ever increases. Coverage floor is the
-  canonical example: start at 0%, raise as you write tests, never lower.
+  canonical example: Copier answer `coverage_fail_under` (default 0%) stamps both
+  `fail_under` and `--cov-fail-under`; raise both as you write tests, never lower
+  ([ADR-005](../decisions/adrs/adr-005-coverage-fail-under-stamp.md)).
 - **C (On-demand):** installed, never blocks. Run when useful. The AI-usage cockpit lives here.
 - **D (Wired-but-waiting):** the job/slot exists in CI and config from day one, but it's a no-op
   until its input exists. The eval gate needs a model call; the ADLC agent-change gate needs
@@ -145,7 +147,7 @@ flowchart BT
 | **Governance** | Is the *agent* allowed to take this action? | — | `permissions.allow`, `AGENTS.md` Forbidden Patterns, ask-before-destructive conventions | A |
 | **Guardrails** | Does the *code* meet the bar? | — | ruff, mypy, import-linter, opengrep self-weakening, gitleaks, `ARCHITECTURE.md` coverage (`just ci-arch`) | A |
 | **Prompts** | Where do prompts live, how are they versioned? | F2 — Own your Prompts | `prompts/` convention; no inline literal over 200 chars | A |
-| **Ratchet** | What quality bar only ever goes up? | — | Coverage floor, complexity ceiling | B |
+| **Ratchet** | What quality bar only ever goes up? | — | Coverage floor (`coverage_fail_under` Copier answer → `fail_under` + `--cov-fail-under`, CI via `just ci-test`), complexity ceiling | B |
 | **Memory** | What did we deliberately choose to remember forever? | — (adjacent to F3, but curated not automatic) | `.agents/memory/` — git-tracked, one file per insight, `MEMORY.md` index | A (git-tracked) |
 | **Context Engineering** | How does the agent spend fewer tokens re-discovering what's already known? | F3 — Own your Context Window | `graphify` (structure), `ctx` (session recall) | C |
 | **Tools/Skills** | How do new capabilities get provisioned, portably? | — | `.agents/skills/` (SKILL.md open standard) + `.claude/skills` symlink — canonical-then-adapt | C |

@@ -46,14 +46,16 @@ rules:
       category: security
       technology: [pre-commit]
 
-  # Agents must not lower the coverage floor.
+  # Agents must not leave the coverage floor unset (both enforcement sites).
   - id: agent-no-lower-coverage-floor
     languages: [toml]
     patterns:
       - pattern-regex: "fail_under\\s*=\\s*0"
     message: >
-      Coverage floor is 0 — the ratchet is unset. Raise fail_under to at least
-      the current measured coverage percentage and never lower it.
+      Coverage floor is 0 — the ratchet is unset. Raise fail_under and the matching
+      --cov-fail-under in pytest addopts to at least the current measured coverage
+      percentage (keep both identical) and never lower them. If this project was
+      stamped with coverage_fail_under, update that Copier answer too.
     severity: WARNING
     metadata:
       category: quality
