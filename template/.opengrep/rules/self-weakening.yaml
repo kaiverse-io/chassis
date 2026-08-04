@@ -7,6 +7,10 @@ rules:
       Self-weakening: --no-verify bypasses pre-commit hooks.
       Fix the violation; never skip the check.
     severity: ERROR
+    paths:
+      exclude:
+        - "**/*.md"
+        - ".opengrep/**"
     metadata:
       category: security
       technology: [git]
@@ -19,6 +23,10 @@ rules:
       Self-weakening: continue-on-error silences CI failures.
       Fix the failing step instead.
     severity: ERROR
+    paths:
+      exclude:
+        - "**/*.md"
+        - ".opengrep/**"
     metadata:
       category: security
       technology: [github-actions]
@@ -42,20 +50,26 @@ rules:
       Self-weakening: pre-commit uninstall removes all hooks.
       This is forbidden. Fix the hook failure instead.
     severity: ERROR
+    paths:
+      exclude:
+        - "**/*.md"
+        - ".opengrep/**"
     metadata:
       category: security
       technology: [pre-commit]
 
-  # Agents must not leave the coverage floor unset (both enforcement sites).
+  # Coverage floor at 0 is a smell for mature projects. WARNING only — new stamps start at 0.
+  # generic: opengrep has no toml language.
   - id: agent-no-lower-coverage-floor
-    languages: [toml]
+    languages: [generic]
+    paths:
+      include:
+        - "**/pyproject.toml"
     patterns:
       - pattern-regex: "fail_under\\s*=\\s*0"
     message: >
-      Coverage floor is 0 — the ratchet is unset. Raise fail_under and the matching
-      --cov-fail-under in pytest addopts to at least the current measured coverage
-      percentage (keep both identical) and never lower them. If this project was
-      stamped with coverage_fail_under, update that Copier answer too.
+      Coverage floor is 0 — the ratchet is unset. Raise fail_under to at least
+      the current measured coverage percentage and never lower it.
     severity: WARNING
     metadata:
       category: quality
