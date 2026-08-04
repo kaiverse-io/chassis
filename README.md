@@ -1,86 +1,65 @@
 # chassis
 
-> A [Copier](https://copier.readthedocs.io/) template that stamps new projects with AI-native
-> guardrails, a working devcontainer, and an AI-usage cockpit — from commit 1, not bolted on
-> after the fact.
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![Copier](https://img.shields.io/badge/copier-9.x-blue.svg)](https://copier.readthedocs.io/)
+[![Release](https://img.shields.io/github/v/release/kaiverse-io/chassis?display_name=tag)](https://github.com/kaiverse-io/chassis/releases)
+[![CI](https://github.com/kaiverse-io/chassis/actions/workflows/ci.yml/badge.svg)](https://github.com/kaiverse-io/chassis/actions/workflows/ci.yml)
 
-Coding agents are fast enough that "we'll add guardrails later" stops being true — by the time
-you notice you need import boundaries, a coverage floor, or secret scanning, an agent has
-already committed a few hundred lines without them. Chassis is a compounding answer: stamp a
-project once and every guardrail is already there; improve the chassis and `copier update`
-flows the improvement into every stamped project as a real diff, with conflicts surfaced
-instead of silently lost. See [the design doc](docs/explanation/design.md) for the full
-reasoning.
+**A [Copier](https://copier.readthedocs.io/) template that stamps AI-native Python projects with guardrails from commit 1** — not bolted on after an agent has already shipped a few hundred unguarded lines.
 
-## What you get
-
-Every tool is wired in from the first commit. What varies is *how strict it is* — the A/B/C/D
-bucket model:
-
-| Bucket | Behavior | What's in it |
-|---|---|---|
-| **A — Guardrails** | Blocks the commit or CI run. For things where "wrong" is always wrong. | `AGENTS.md`, ruff+mypy, import-linter boundary slot, opengrep self-weakening + prompts-as-code rules, gitleaks, conventional commits, CODEOWNERS, Diátaxis docs, `prompts/` convention, `ARCHITECTURE.md` coverage gate (`just ci-arch`), a 4-layer devcontainer |
-| **B — Ratcheting** | Present from day one; the threshold only ever increases. | Coverage floor (Copier answer `coverage_fail_under`, default 0% — raise `fail_under` and `--cov-fail-under` together; CI via `just ci-test` → pytest). On update, keep the answer at the current floor so a default `0` cannot silently rewrite it. Complexity ceiling. |
-| **C — On-demand** | Installed automatically, never blocks anything — run it when it's useful. | The [AI-usage cockpit](docs/explanation/ai-usage-cockpit.md): `codeburn`, `abtop`, AI Engineer Coach, `graphify`, `ctx`; the `/arch-review` skill (architecture-doc accuracy) |
-| **D — Wired-but-waiting** | The slot exists in CI/config from day one but is a deliberate no-op until its input exists. | `evals/` (eval gate), ADLC agent-change gate |
-
-The cockpit is the piece worth calling out: five tools that turn "working with a coding agent"
-into something with a feedback loop. `ctx` indexes full session history so corrections don't
-have to be repeated; `codeburn`/`abtop` surface cost and context usage; `graphify` turns the
-codebase into a queryable graph; and `/dev-coach` periodically turns that signal into concrete
-additions to the project's own `AGENTS.md` — asked-for, never silent.
+Stamp once; every gate is already there. Improve the chassis; `copier update` flows the change into every stamped project as a real diff. Full reasoning: [design doc](docs/explanation/design.md).
 
 ## Quick start
 
-Requires [Copier](https://copier.readthedocs.io/) (`pip install copier` or `uvx copier`) and,
-for the devcontainer, Docker.
+Requires Copier (`pip install copier` or `uvx copier`) and Docker for the devcontainer.
 
 ```bash
 copier copy gh:kaiverse-io/chassis path/to/new-project --trust
 ```
 
-`--trust` is required by copier 9.x to run this template's `_tasks` (`git init`, `uv sync`,
-`pre-commit install`). Only pass `--trust` for templates you actually trust — this one included.
-Open the result in a devcontainer (VS Code will offer to) and you have a working, linted,
-tested, guardrailed project before writing a line of your own code.
+`--trust` is required by Copier 9.x for this template's `_tasks` (`git init`, `uv sync`, `pre-commit install`). Only pass it for templates you actually trust.
 
-## Update a stamped project
+Default license answer: **Apache-2.0** (MIT and Proprietary remain available).
+
+Open the result in a devcontainer and you have a linted, tested, guardrailed project before writing a line of your own code.
 
 ```bash
 cd path/to/stamped-project
-copier update --trust
+copier update --trust    # pulls the latest *tag*, not main HEAD
 ```
 
-Note: `copier update`/`copier copy` resolve the **latest git tag**, not `main`'s HEAD — a commit
-that isn't tagged yet won't show up. See [CONTRIBUTING.md](CONTRIBUTING.md#releasing-a-version)
-if you're the one shipping the chassis change, not just consuming it.
+## What you get
+
+| Bucket | Behavior | Contents |
+|---|---|---|
+| **A — Guardrails** | Blocks commit / CI when wrong is always wrong | `AGENTS.md`, ruff + mypy, import-linter slot, opengrep self-weakening + prompts-as-code, gitleaks, conventional commits, CODEOWNERS, Diátaxis docs, `prompts/` convention, `ARCHITECTURE.md` coverage (`just ci-arch`), 4-layer devcontainer |
+| **B — Ratcheting** | Present from day one; thresholds only rise | Coverage floor (`coverage_fail_under`, default `0`), complexity ceiling |
+| **C — On-demand** | Installed, never blocking | [AI-usage cockpit](docs/explanation/ai-usage-cockpit.md): `codeburn`, `abtop`, AI Engineer Coach, `graphify`, `ctx`; `/arch-review` skill |
+| **D — Wired-but-waiting** | Slot exists; no-op until input exists | `evals/` gate, ADLC agent-change gate |
+
+The cockpit closes the loop: session history (`ctx`), cost/context (`codeburn` / `abtop`), codebase graph (`graphify`), and `/dev-coach` turning signal into durable `AGENTS.md` rules — asked-for, never silent.
 
 ## Working on chassis itself
 
-Chassis has its own standalone devcontainer — `git clone` this repo alone and "Reopen in
-Container." Its `post-create.sh`, Claude Code settings/hooks, and `dev-coach` skill are
-**symlinks** into `template/`, so chassis dogfoods the identical cockpit it ships with zero
-drift possible. `just ci` lints the chassis itself; `just accept` stamps a throwaway project
-and verifies its `just ci` is green — if that ever takes more than ~2 minutes, the chassis has
-gotten too heavy. Full reasoning in `AGENTS.md`.
+Chassis has a standalone devcontainer — clone this repo alone and reopen in container. `post-create.sh`, Claude Code settings/hooks, and `dev-coach` are **symlinks into `template/`**, so chassis dogfoods the identical cockpit it ships. `just ci` lints the chassis; `just accept` stamps a throwaway project and requires its `just ci` green (~2 minutes ceiling — if slower, the chassis is too heavy).
 
 ## Versioning
 
-SemVer tags + `CHANGELOG.md`. `copier update` in a stamped project pulls improvements.
-See [CONTRIBUTING.md](CONTRIBUTING.md#releasing-a-version) for the release process.
+SemVer tags + [`CHANGELOG.md`](CHANGELOG.md). Consumers resolve the **latest tag**, not `main`. Release process: [CONTRIBUTING.md](CONTRIBUTING.md#releasing-a-version).
 
-## Docs
+## Documentation
 
-- [Design](docs/explanation/design.md) — the ten guiding principles, the two-plane model, the
-  A/B/C/D buckets, the ten capability layers, and the thin-chassis discipline. Start here for
-  "why does this piece exist."
-- [AI-usage cockpit](docs/explanation/ai-usage-cockpit.md) — what the five bucket-C tools do,
-  how they close the loop back into `AGENTS.md`, and how to add a sixth.
-- [Devcontainer persistence](docs/explanation/devcontainer-persistence.md) — what survives a
-  rebuild vs. what doesn't, and why.
-- [ADR log](docs/decisions/adrs/) — MADR decision records.
+- [Design](docs/explanation/design.md) — principles, two-plane model, A/B/C/D buckets, thin-chassis discipline
+- [AI-usage cockpit](docs/explanation/ai-usage-cockpit.md)
+- [Devcontainer persistence](docs/explanation/devcontainer-persistence.md)
+- [ADR log](docs/decisions/adrs/)
 
-## Status
+## Contributing
 
-Solo-maintained, actively used to build real projects, evolving in the open (see `CHANGELOG.md`).
-Not yet 1.0 — expect the bucket contents to keep growing as gaps get found by actually using it.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Security reports: [SECURITY.md](SECURITY.md).
+
+## License
+
+[Apache License 2.0](LICENSE)
+
+Solo-maintained, used on real projects, evolving in the open. Pre-1.0 — bucket contents will keep growing as gaps show up in practice.
