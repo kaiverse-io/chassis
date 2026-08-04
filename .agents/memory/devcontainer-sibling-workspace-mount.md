@@ -21,7 +21,7 @@ too, at a hardcoded literal path: `..:/workspaces/{{ python_package_name }}:cach
 `${localWorkspaceFolderBasename}` is substituted **only in devcontainer.json**; Docker Compose
 resolves `${...}` from its own environment, where the variable is unset, so it silently became
 `""`. The workspace mounted at bare `/workspaces` while VS Code opened `/workspaces/<name>`,
-failing with "workspace doesn't exist" on every stamped project (hit in aither, 2026-07-15;
+failing with "workspace doesn't exist" on every stamped project (hit 2026-07-15;
 fixed in v0.8.6).
 
 **Why**: the shared-parent mount was the same class of cross-project information leak that
