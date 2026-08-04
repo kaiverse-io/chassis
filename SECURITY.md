@@ -10,7 +10,7 @@ backported patch branches for older `0.x` tags.
 
 Please report suspected vulnerabilities **privately**, not in a public issue or pull request.
 
-- Preferred: open a [GitHub private security advisory](https://github.com/km2411/chassis/security/advisories/new)
+- Preferred: open a [GitHub private security advisory](https://github.com/kaiverse-io/chassis/security/advisories/new)
   ("Report a vulnerability").
 - Alternatively, email the maintainer at the address on the git commit history.
 

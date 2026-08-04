@@ -1,5 +1,5 @@
 # Standalone dev environment for chassis itself — not a stamped project's devcontainer
-# (that's template/.devcontainer/*.jinja). This lets someone clone km2411/chassis on its
+# (that's template/.devcontainer/*.jinja). This lets someone clone kaiverse-io/chassis on its
 # own and get a working "Reopen in Container" experience without needing a sibling
 # project to piggyback inside, which is how chassis was actually developed before this
 # file existed.

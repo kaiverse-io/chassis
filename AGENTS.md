@@ -13,8 +13,8 @@ last_reviewed: 2026-07-08
 
 ## What this repo is
 
-`km2411/chassis` is a [Copier](https://copier.readthedocs.io/) template. Running
-`copier copy gh:km2411/chassis <dest> --trust` stamps a new project with:
+`kaiverse-io/chassis` is a [Copier](https://copier.readthedocs.io/) template. Running
+`copier copy gh:kaiverse-io/chassis <dest> --trust` stamps a new project with:
 
 - Guardrails (A): AGENTS.md, ruff/mypy, import-linter boundary slot, opengrep self-weakening,
   gitleaks, conventional commits, CODEOWNERS, Diátaxis docs, pre-commit, `ARCHITECTURE.md`
@@ -145,8 +145,8 @@ project gets). One file per insight; `MEMORY.md` index (one line per entry).
   in AGENTS.md." See `.agents/skills/dev-coach/SKILL.md`.
 - This cockpit is a chassis-level standard, not project-specific — every project stamped from
   this chassis gets it via `post-create.sh`. See
-  [chassis's docs/explanation/ai-usage-cockpit.md](https://github.com/km2411/chassis/blob/main/docs/explanation/ai-usage-cockpit.md)
-  for the full writeup and [ADR-002](https://github.com/km2411/chassis/blob/main/docs/decisions/adrs/adr-002-ai-usage-cockpit.md).
+  [chassis's docs/explanation/ai-usage-cockpit.md](https://github.com/kaiverse-io/chassis/blob/main/docs/explanation/ai-usage-cockpit.md)
+  for the full writeup and [ADR-002](https://github.com/kaiverse-io/chassis/blob/main/docs/decisions/adrs/adr-002-ai-usage-cockpit.md).
 
 <!-- cockpit-section:end -->
 

@@ -36,7 +36,7 @@ Requires [Copier](https://copier.readthedocs.io/) (`pip install copier` or `uvx 
 for the devcontainer, Docker.
 
 ```bash
-copier copy gh:km2411/chassis path/to/new-project --trust
+copier copy gh:kaiverse-io/chassis path/to/new-project --trust
 ```
 
 `--trust` is required by copier 9.x to run this template's `_tasks` (`git init`, `uv sync`,
