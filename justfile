@@ -75,7 +75,11 @@ accept:
 
 # ── Chassis CI (dogfoods its own gates) ──────────────────────────────────────
 
-ci: ci-lint
+ci: ci-lint ci-secrets
+
+ci-secrets:
+    gitleaks detect --source . --verbose
+    opengrep scan --config template/.opengrep/rules/ . --error --severity ERROR
 
 ci-lint:
     #!/usr/bin/env python3
