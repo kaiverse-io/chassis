@@ -9,6 +9,22 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
+## [0.13.0](https://github.com/kaiverse-io/chassis/compare/v0.12.0...v0.13.0) (2026-08-09)
+
+
+### Features
+
+* automated releases via release-please ([7c9315d](https://github.com/kaiverse-io/chassis/commit/7c9315da2de8b11f2247910b926dd5a27088e997))
+* automated releases via release-please, chassis root + template ([45991b5](https://github.com/kaiverse-io/chassis/commit/45991b5a8db7e1054b97a4a69c892adb6e5ab544))
+* real Governance adapters for Codex CLI and goose, not just docs ([bc60fee](https://github.com/kaiverse-io/chassis/commit/bc60feeac2b6dd30f87b93a5897c117930360d32))
+
+
+### Bug Fixes
+
+* close the gap between chassis's determinism claims and what's enforced ([daffa6c](https://github.com/kaiverse-io/chassis/commit/daffa6cde2abcc6b954a012d4223f2dadd18e78b))
+* close the gap between chassis's determinism claims and what's enforced ([06663d7](https://github.com/kaiverse-io/chassis/commit/06663d7ebb6faf30d8a4aeef0c95f604829fdbd2))
+* exclude jinja agent docs from opengrep self-weakening ([8d8600f](https://github.com/kaiverse-io/chassis/commit/8d8600f0d9df12645705f0146864c384e69d2d8f))
+
 ## [Unreleased]
 
 ### Added
