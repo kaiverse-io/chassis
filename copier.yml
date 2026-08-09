@@ -1,8 +1,14 @@
 _min_copier_version: "9.0.0"
 _subdirectory: template
 _answers_file: .copier-answers.yml
+# Default (false) dereferences symlinks into duplicated real files/directories on every
+# stamp and every `copier update` — the only symlink in template/ today
+# (.claude/skills -> ../.agents/skills) was silently losing its "one canonical copy,
+# thin adapter" property because of this. Its name doesn't end in .jinja, so it isn't
+# affected by preserve_symlinks' target-gets-Jinja-rendered special case.
+_preserve_symlinks: true
 _tasks:
-  - git init
+  - git init -b main
   - uv sync
   - "pre-commit install || echo 'pre-commit not found — run: pre-commit install'"
 
@@ -34,7 +40,7 @@ coverage_fail_under:
 
 include_ts:
   type: bool
-  help: "Include TypeScript module? (opt-in)"
+  help: "Add TypeScript-oriented dev tooling (pre-commit cache volume, VS Code extension)? Does not scaffold any TypeScript files or a package.json — bring your own TS module and this just wires the tooling around it."
   default: false
 
 install_ai_coach:
@@ -44,8 +50,8 @@ install_ai_coach:
 
 enable_docker_outside_of_docker:
   type: bool
-  help: "Enable docker-outside-of-docker (forwards the host's docker.sock, for projects whose docker-compose.yml boots services beyond `app`)? Only works when the host itself runs Docker — turn off for a no-host-Docker remote/cloud devcontainer."
-  default: true
+  help: "Enable docker-outside-of-docker (forwards the host's docker.sock, for projects whose docker-compose.yml boots services beyond `app`)? Only works when the host itself runs Docker — leave off for a no-host-Docker remote/cloud devcontainer. Grants the container read-write access to the host's docker socket (post-create.sh chmod 666's it) — equivalent to root on the host, so this is opt-in, not a default."
+  default: false
 
 author_name:
   type: str
@@ -58,7 +64,7 @@ author_email:
 
 github_owner:
   type: str
-  help: "GitHub owner / org (e.g. 'km2411')"
+  help: "GitHub owner / org (e.g. 'kaiverse-io')"
 
 license:
   type: str

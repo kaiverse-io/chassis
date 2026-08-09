@@ -24,13 +24,26 @@ accept:
         --data "description=Chassis acceptance test" \
         --data "author_name=Test" \
         --data "author_email=test@example.com" \
-        --data "github_owner=km2411" \
+        --data "github_owner=kaiverse-io" \
         --data "license=Proprietary" \
         --overwrite --quiet
     test -f "$tmpdir/.copier-answers.yml" || {
         echo "FAIL: .copier-answers.yml was not generated — copier update would be broken for every stamped project"
         exit 1
     }
+    echo "Running tests/checks/ against the stamped project …"
+    failed=()
+    for check in tests/checks/*.sh; do
+        if ! bash "$check" "$tmpdir"; then
+            failed+=("$check")
+        fi
+    done
+    if [ "${#failed[@]}" -gt 0 ]; then
+        echo "FAILED CHECKS (${#failed[@]}):"
+        printf '  - %s\n' "${failed[@]}"
+        exit 1
+    fi
+    echo "All tests/checks/ passed."
     # Default coverage floor must stamp as 0 in BOTH enforcement sites (keep in sync).
     grep -q -- '--cov-fail-under=0' "$tmpdir/pyproject.toml" || {
         echo "FAIL: default stamp missing --cov-fail-under=0 in pytest addopts"
@@ -53,7 +66,7 @@ accept:
         --data "description=Coverage floor stamp check" \
         --data "author_name=Test" \
         --data "author_email=test@example.com" \
-        --data "github_owner=km2411" \
+        --data "github_owner=kaiverse-io" \
         --data "license=Proprietary" \
         --data "coverage_fail_under=42" \
         --overwrite --quiet
@@ -127,6 +140,13 @@ ci-lint:
         )
         sys.exit(1)
     print("Cockpit sections match.")
+
+# ── Evals (chassis testing itself — bucket C, not a gate) ────────────────────
+
+# Does an agent actually consult graphify/ctx before raw-grepping? Costs real API
+# calls; never part of `ci`/`accept`. See evals/chassis/README.md.
+eval-cockpit-usage n="5":
+    bash evals/chassis/run.sh {{n}}
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 

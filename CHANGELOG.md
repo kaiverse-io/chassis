@@ -9,6 +9,64 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- `template/CLAUDE.md` (`@AGENTS.md` import) — Claude Code reads `CLAUDE.md`, not
+  `AGENTS.md`; without this bridge, every stamped project's Forbidden Patterns and Hard
+  Rules never reached a Claude Code session at all.
+- `template/LICENSE.jinja` — no LICENSE file was ever stamped despite `pyproject.toml`
+  declaring one in metadata.
+- `tests/checks/` — a regression suite (one script per defect, taking a stamped tmpdir)
+  that `just accept` now runs and reports in full, instead of aborting at the first
+  failure.
+- `_preserve_symlinks: true` in `copier.yml` — the one symlink in `template/`
+  (`.claude/skills -> ../.agents/skills`) was being dereferenced into a duplicated real
+  directory on every stamp and `copier update`, silently breaking the "one canonical
+  copy, thin adapter" pattern it exists to demonstrate.
+- `permissions.deny: ["Bash(*--no-verify*)"]` in `.claude/settings.json.jinja` —
+  `Bash(git commit *)` was pre-approving `--no-verify`, the first Forbidden Pattern in
+  AGENTS.md, without a prompt.
+
+### Fixed
+
+- `agent-no-bare-noqa` and `no-inline-prompt-literals` opengrep rules promoted
+  `WARNING` → `ERROR` — both runners filter `--severity ERROR`, so these never actually
+  fired. `agent-no-lower-coverage-floor` stays `WARNING` deliberately (see its own
+  comment) — promoting it would fail the default stamp's intentional `fail_under = 0`.
+- `template/.agents/skills/arch-review/SKILL.md` renamed to `SKILL.md.jinja` — it
+  contains `{{ python_package_name }}` but shipped unrendered to every stamped project.
+- `_tasks`: `git init` → `git init -b main` — CI and CONTRIBUTING both assume `main`;
+  on any host without `init.defaultBranch` set, a fresh stamp landed on `master` and CI
+  silently never fired.
+- `uv` and `just` installs in `post-create.sh` are now pinned to a specific release and
+  SHA-256 verified, matching the standard `ctx` already held in the same file — both
+  were previously an unpinned `curl | sh`/`curl | bash` against "latest."
+- `dev-coach/SKILL.md` step 2 now reads `.agents/memory/` directly instead of filtering
+  on `metadata.type: feedback` — chassis's own real memory files all use
+  `type: project`, so the filter matched zero files even against chassis's own
+  dogfooded memory.
+- `AGENTS.md.jinja`'s "Agent-memory convention" pointed agents at
+  `~/.claude/projects/<slug>/memory/`, which only exists because a `post-create.sh`
+  symlink step recreates it (and degrades to a warning, not an abort, on failure) — now
+  points at the canonical `.agents/memory/` directly.
+- Dangling `ADR-016` citations in `dev-coach/SKILL.md` and
+  `docs/decisions/adrs/adr-002-ai-usage-cockpit.md` — no such ADR exists.
+- Stale `github_owner=km2411` in `justfile`'s `accept` recipe and `copier.yml`'s help
+  text, and in `LICENSE`'s copyright line — the org renamed to `kaiverse-io`.
+
+### Changed
+
+- `enable_docker_outside_of_docker` now defaults to `false`. It was `true` while its
+  own help text called it "opt-in," and grants the container read-write access to the
+  host's docker socket (`post-create.sh` `chmod 666`'s it) — equivalent to root on the
+  host. True opt-in also fits the template's own claim to support no-host-Docker
+  remote/cloud devcontainers better than a default-on socket mount does.
+- `include_ts`'s help text now describes what it actually does (gates a pre-commit
+  cache volume and one VS Code extension) instead of implying a generated TypeScript
+  scaffold that never existed.
+
 ## [0.11.0] — 2026-08-02
 
 ### Added
