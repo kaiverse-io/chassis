@@ -9,7 +9,7 @@
 
 Stamp once; every gate is already there. Improve the chassis; `copier update` flows the change into every stamped project as a real diff. Full reasoning: [design doc](docs/explanation/design.md).
 
-That guarantee currently has two tiers, and we'd rather say so than overclaim it. What runs in CI and git — Guardrails, Ratchet — holds no matter which agent, harness, or human touched the repo: it checks the diff, not who wrote it. What runs through Claude Code's own hooks and settings — Governance's live enforcement, the AI-usage cockpit — is a real, working enhancement today, but only for that one harness. See [Harness neutrality: what's guaranteed vs. what's Claude-enhanced](docs/explanation/design.md#harness-neutrality-whats-guaranteed-vs-whats-claude-enhanced) for the exact split and where it's headed.
+That guarantee currently has two tiers, and we'd rather say so than overclaim it. What runs in CI and git — Guardrails, Ratchet — holds no matter which agent, harness, or human touched the repo: it checks the diff, not who wrote it. Governance now has a real adapter per harness — `.claude/settings.json` (Claude Code), `.codex/config.toml` + `.codex/rules/` (Codex CLI), `GOOSE_MODE` (goose) — but each is trust-gated or coarser than CI, so it's real, working enforcement, not yet a second unconditional floor. The AI-usage cockpit remains Claude-Code-specific. See [Harness neutrality: what's guaranteed vs. what's harness-specific](docs/explanation/design.md#harness-neutrality-whats-guaranteed-vs-whats-harness-specific) for the exact split and where it's headed.
 
 ## Quick start
 
@@ -34,9 +34,9 @@ copier update --trust    # pulls the latest *tag*, not main HEAD
 
 | Bucket | Behavior | Contents |
 |---|---|---|
-| **A — Guardrails** | Blocks commit / CI when wrong is always wrong | `AGENTS.md`, ruff + mypy, import-linter slot, opengrep self-weakening + prompts-as-code, gitleaks, conventional commits, CODEOWNERS, Diátaxis docs, `prompts/` convention, `ARCHITECTURE.md` coverage (`just ci-arch`), 4-layer devcontainer |
+| **A — Guardrails** | Blocks commit / CI when wrong is always wrong | `AGENTS.md`, ruff + mypy, import-linter slot, opengrep self-weakening + prompts-as-code, gitleaks, conventional commits, CODEOWNERS, Diátaxis docs, `prompts/` convention, `ARCHITECTURE.md` coverage (`just ci-arch`), 4-layer devcontainer, per-harness Governance (`.claude/settings.json`, `.codex/config.toml` + rules, `GOOSE_MODE`) |
 | **B — Ratcheting** | Present from day one; thresholds only rise | Coverage floor (`coverage_fail_under`, default `0`), complexity ceiling |
-| **C — On-demand** | Installed, never blocking | [AI-usage cockpit](docs/explanation/ai-usage-cockpit.md): `codeburn`, `abtop`, AI Engineer Coach, `graphify`, `ctx`; `/arch-review` and `/dev-coach` skills *(their signal-capture tools are agent-agnostic; the loop-closing skills themselves are Claude-Code-native today)* |
+| **C — On-demand** | Installed, never blocking | [AI-usage cockpit](docs/explanation/ai-usage-cockpit.md): `codeburn`, `abtop`, AI Engineer Coach, `graphify`, `ctx`; `/arch-review` and `/dev-coach` skills *(their signal-capture tools are agent-agnostic; the loop-closing skills themselves are Claude-Code-native today)*; opt-in automated releases (`enable_release_automation` → release-please) |
 | **D — Wired-but-waiting** | Slot exists; no-op until input exists | `evals/` gate, ADLC agent-change gate |
 
 The cockpit closes the loop: session history (`ctx`), cost/context (`codeburn` / `abtop`), codebase graph (`graphify`), and `/dev-coach` turning signal into durable `AGENTS.md` rules — asked-for, never silent.

@@ -1,7 +1,7 @@
 ---
 kind: agent-context
 status: active
-last_reviewed: 2026-07-08
+last_reviewed: 2026-08-09
 ---
 
 # Chassis — Agent Context
@@ -19,12 +19,17 @@ last_reviewed: 2026-07-08
 - Guardrails (A): AGENTS.md, ruff/mypy, import-linter boundary slot, opengrep self-weakening,
   gitleaks, conventional commits, CODEOWNERS, Diátaxis docs, pre-commit, `ARCHITECTURE.md`
   coverage gate (`just ci-arch`).
+- Governance (A): per-harness config — `.claude/settings.json` (Claude Code),
+  `.codex/config.toml` + `.codex/rules/` (Codex CLI), `GOOSE_MODE` (goose) — plus `AGENTS.md`
+  Forbidden Patterns. Each requires a human to trust the project on their own machine first;
+  see [design.md](docs/explanation/design.md#harness-neutrality-whats-guaranteed-vs-whats-harness-specific).
 - Ratcheting gates (B): coverage floor (only-increase; stamped via Copier
   `coverage_fail_under` into both `fail_under` and `--cov-fail-under`; enforced by
   `just ci-test`). On `copier update`, projects must carry their current answer so a
   default of `0` cannot silently lower a raised floor. Complexity ceiling.
 - On-demand tools (C): the AI-usage cockpit — codeburn, abtop, AI Engineer Coach, graphify,
-  ctx; the `/arch-review` skill (architecture-doc accuracy).
+  ctx; the `/arch-review` skill (architecture-doc accuracy); opt-in automated releases
+  (`enable_release_automation` → release-please, off by default).
 - Wired-but-waiting slots (D): eval gate, ADLC agent-change gate.
 
 See [docs/explanation/design.md](docs/explanation/design.md) for the full breakdown of *why*

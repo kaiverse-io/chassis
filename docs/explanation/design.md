@@ -1,7 +1,7 @@
 ---
 kind: explanation
 status: active
-last_reviewed: 2026-07-15
+last_reviewed: 2026-08-09
 ---
 
 # Chassis design: the two planes, the buckets, and the layers
@@ -62,8 +62,8 @@ Two mistakes follow directly from collapsing this distinction:
 
 **Mistake 1: importing Plane-2 concerns into chassis.**
 [12-factor-agents](https://github.com/humanlayer/12-factor-agents) is a Plane-2 framework —
-it's about how to architect a *shipped* agent. Ten of its twelve factors (F1, F4, F6, F7,
-F9–F12) don't belong in chassis at all, because chassis doesn't know what you're shipping. If
+it's about how to architect a *shipped* agent. Ten of its twelve factors (F1, F4–F12) don't
+belong in chassis at all, because chassis doesn't know what you're shipping. If
 chassis tried to prescribe "how your agent should manage execution state" (F5) or "how your
 agent should be triggered" (F11), it would be making product decisions on your behalf. Exactly
 two factors are different, because they describe how *any* agent works — including the one
