@@ -57,26 +57,25 @@ just accept              # stamp a throwaway project and verify its own `just ci
 
 ## Releasing a version
 
-A commit to `main` is **not** a release. Copier resolves a git-based template source to the
-**latest semver tag**, not the branch HEAD — a change that isn't tagged is invisible to everyone
-running `copier copy`/`copier update`, with no error. If a change should reach stamped projects,
-it needs a tag.
+A commit to `main` is **not** a release by itself. Copier resolves a git-based template source to
+the **latest semver tag**, not the branch HEAD — a change that isn't tagged is invisible to
+everyone running `copier copy`/`copier update`, with no error. Tagging is automated by
+[release-please](https://github.com/googleapis/release-please-action)
+(`.github/workflows/release-please.yml` — see
+[ADR-007](docs/decisions/adrs/adr-007-automated-releases-via-release-please.md)), not manual:
 
-Checklist:
-
-1. Make the change in `template/` (or chassis's own tooling).
+1. Make the change in `template/` (or chassis's own tooling), using a
+   [Conventional Commit](https://www.conventionalcommits.org/) prefix — the prefix is what decides
+   the version bump (see "Versioning" below), not a judgment call at tag time anymore.
 2. `just ci` — chassis's guardrails must pass.
 3. `just accept` — the end-to-end stamp-and-verify.
-4. Add a `CHANGELOG.md` entry under a new version heading (`## [x.y.z] — YYYY-MM-DD`),
-   [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) style. Move `[Unreleased]` items down.
-5. Commit and push `main`.
-6. **Tag it and push the tag** — the step that actually ships the release:
-   ```bash
-   git tag -a vX.Y.Z -m "short summary"
-   git push origin main
-   git push origin vX.Y.Z
-   ```
-7. Verify the tag is what resolves, especially after a tagging mistake:
+4. Commit and push (or merge a PR) to `main`. Do **not** hand-edit `CHANGELOG.md` — release-please
+   generates its entries from commit history.
+5. release-please opens or updates a standing `chore(main): release X.Y.Z` PR, accumulating every
+   commit since the last release. **Merging that PR is what actually ships the release** — it
+   bumps `.release-please-manifest.json`, rewrites `CHANGELOG.md`, and pushes the `vX.Y.Z` tag +
+   GitHub Release automatically. Nothing to run locally.
+6. Verify the tag is what resolves, if you need to double check what a fresh `copier copy` sees:
    ```bash
    rm -rf ~/.cache/copier   # copier caches the resolved clone — clear it to force fresh resolution
    git describe --tags      # should print exactly vX.Y.Z with no -N-gHASH suffix when HEAD is the tag
@@ -107,12 +106,15 @@ is automatic and the *validation* stays exactly as strict as a hand-authored cha
 
 ### Versioning
 
-SemVer, pre-1.0 (`0.x.y`) while the template is still finding its shape. Treat a minor bump
-(`0.x`) as a notable addition or a change in stamped output (new copier variable, new default);
-reserve patch bumps (`0.x.y`) for pure bugfixes with no new template content.
+SemVer, pre-1.0 (`0.x.y`) while the template is still finding its shape. release-please computes
+the bump directly from Conventional Commit prefixes since the last release, not from manual
+judgment: `feat:` → minor, `fix:` → patch, a `!` after the type or a `BREAKING CHANGE:` footer →
+major. Pick the prefix with that mapping in mind — it's no longer just changelog categorization,
+it's the thing that decides the version number.
 
 If you're unsure whether something needs a tag, ask: "would a project running `copier update`
-today actually pick this up?" If not without a new tag, it needs one before the change is shipped.
+today actually pick this up?" If not without a new tag, it needs one — which now just means
+merging release-please's standing release PR.
 
 ## Reporting security issues
 

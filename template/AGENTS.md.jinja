@@ -48,6 +48,14 @@ docs/decisions/adrs/             — MADR decision records
   `--cov-fail-under` in pytest `addopts`) — only ever increase it. Initial floor is
   stamped from the Copier answer `coverage_fail_under` (per package via
   `python_package_name` as the cov target); raise both values together after measuring.
+{% if enable_release_automation -%}
+- Releases are automated (release-please, `.github/workflows/release-please.yaml`): a
+  Conventional Commit prefix on `main` directly decides the version bump
+  (`feat:`→minor, `fix:`→patch, `!`/`BREAKING CHANGE:`→major) — pick it accordingly, not
+  just for changelog categorization. Never hand-edit `CHANGELOG.md` or `pyproject.toml`'s
+  `version`; merging the bot's standing release PR is what ships a release. See
+  CONTRIBUTING.md's "Releasing a version" section.
+{% endif -%}
 
 ## Architecture documentation
 

@@ -12,7 +12,20 @@ last_reviewed: <!-- update when reviewing -->
 3. Commit with [conventional commits](https://www.conventionalcommits.org/):
    `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`, `perf:`.
 4. Open a PR; all CI checks must pass.
+{% if enable_release_automation %}
+## Releasing a version
 
+A commit to `main` is **not** a release by itself. Tagging is automated by
+[release-please](https://github.com/googleapis/release-please-action)
+(`.github/workflows/release-please.yaml`):
+
+1. Merge to `main` using a Conventional Commit prefix — it decides the version bump directly:
+   `feat:` → minor, `fix:` → patch, a `!` after the type or a `BREAKING CHANGE:` footer → major.
+2. release-please opens or updates a standing `chore(main): release X.Y.Z` PR, accumulating every
+   commit since the last release. Don't hand-edit `CHANGELOG.md` — it generates those entries.
+3. **Merging that PR is what ships the release** — it bumps `pyproject.toml`'s version, rewrites
+   `CHANGELOG.md`, and pushes the `vX.Y.Z` tag + GitHub Release. Nothing to run locally.
+{% endif %}
 ## Decisions
 
 Significant decisions go in `docs/decisions/adrs/` as [MADR](https://adr.github.io/madr/) files.

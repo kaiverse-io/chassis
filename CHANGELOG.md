@@ -28,6 +28,15 @@ changed, tersely. Anything longer is in git history or an ADR.
 - `permissions.deny: ["Bash(*--no-verify*)"]` in `.claude/settings.json.jinja` —
   `Bash(git commit *)` was pre-approving `--no-verify`, the first Forbidden Pattern in
   AGENTS.md, without a prompt.
+- `.github/workflows/release-please.yml` (chassis's own root, unconditional) — a merge
+  to `main` was not itself a release (Copier resolves the latest tag, not HEAD), and the
+  only path to a tag was a manual checklist step in `CONTRIBUTING.md`, easy to forget.
+  release-please now stages a `chore(main): release X.Y.Z` PR from Conventional Commits;
+  merging it cuts the tag + GitHub Release. See
+  [ADR-007](docs/decisions/adrs/adr-007-automated-releases-via-release-please.md).
+- `enable_release_automation` Copier question (default `false`) — the same release-please
+  automation, opt-in for stamped projects, bumping `pyproject.toml`'s version instead of
+  chassis's own package-less root.
 
 ### Fixed
 

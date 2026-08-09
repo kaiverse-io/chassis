@@ -1,0 +1,23 @@
+name: release-please
+
+# Replaces the manual "tag it and push the tag" step in CONTRIBUTING.md's
+# "Releasing a version" section — see docs/decisions/adrs/adr-007-automated-releases-via-release-please.md.
+# Merges to main accumulate into a standing "chore(main): release X.Y.Z" PR;
+# merging that PR is what actually cuts the tag + GitHub Release.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          release-type: simple
