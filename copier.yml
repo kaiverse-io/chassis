@@ -53,6 +53,11 @@ enable_docker_outside_of_docker:
   help: "Enable docker-outside-of-docker (forwards the host's docker.sock, for projects whose docker-compose.yml boots services beyond `app`)? Only works when the host itself runs Docker — leave off for a no-host-Docker remote/cloud devcontainer. Grants the container read-write access to the host's docker socket (post-create.sh chmod 666's it) — equivalent to root on the host, so this is opt-in, not a default."
   default: false
 
+enable_release_automation:
+  type: bool
+  help: "Add automated release-PR + tagging via release-please? Opt-in — once enabled, merges to main accumulate into an auto-maintained release PR; merging *that* PR bumps pyproject.toml's version, updates CHANGELOG.md, and pushes a git tag + GitHub Release automatically. Off by default: not every stamped project wants versioned releases (e.g. an internal app, or one with an existing release process)."
+  default: false
+
 author_name:
   type: str
   help: "Author name"

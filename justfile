@@ -79,6 +79,49 @@ accept:
         exit 1
     }
     rm -rf "$tmpdir_floor"
+    # enable_release_automation defaults to false (release-automation-gated-by-default.sh
+    # checks that case above) — this second stamp is the "true" case: confirm the
+    # conditional-filename files actually render, with the expected pinned content, when asked.
+    tmpdir_release=$(mktemp -d)
+    copier copy . "$tmpdir_release" --vcs-ref=HEAD --defaults --trust \
+        --data "project_name=ReleaseProject" \
+        --data "python_package_name=release_project" \
+        --data "description=Release automation stamp check" \
+        --data "author_name=Test" \
+        --data "author_email=test@example.com" \
+        --data "github_owner=kaiverse-io" \
+        --data "license=Proprietary" \
+        --data "enable_release_automation=true" \
+        --overwrite --quiet
+    test -f "$tmpdir_release/.github/workflows/release-please.yaml" || {
+        echo "FAIL: enable_release_automation=true did not stamp .github/workflows/release-please.yaml"
+        exit 1
+    }
+    grep -q 'release-type: python' "$tmpdir_release/.github/workflows/release-please.yaml" || {
+        echo "FAIL: release-please.yaml missing release-type: python"
+        exit 1
+    }
+    grep -q 'googleapis/release-please-action@v5' "$tmpdir_release/.github/workflows/release-please.yaml" || {
+        echo "FAIL: release-please.yaml not pinned to googleapis/release-please-action@v5"
+        exit 1
+    }
+    test -f "$tmpdir_release/release-please-config.json" || {
+        echo "FAIL: enable_release_automation=true did not stamp release-please-config.json"
+        exit 1
+    }
+    grep -q '"release-type": "python"' "$tmpdir_release/release-please-config.json" || {
+        echo "FAIL: release-please-config.json missing release-type: python"
+        exit 1
+    }
+    test -f "$tmpdir_release/.release-please-manifest.json" || {
+        echo "FAIL: enable_release_automation=true did not stamp .release-please-manifest.json"
+        exit 1
+    }
+    grep -q '"\.": "0\.1\.0"' "$tmpdir_release/.release-please-manifest.json" || {
+        echo "FAIL: .release-please-manifest.json not seeded at 0.1.0"
+        exit 1
+    }
+    rm -rf "$tmpdir_release"
     echo "Running just ci in stamped project …"
     cd "$tmpdir"
     just ci

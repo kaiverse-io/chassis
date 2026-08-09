@@ -1,0 +1,23 @@
+name: release-please
+
+# Replaces manually computing a version and tagging by hand. Merges to main accumulate
+# into a standing "chore(main): release X.Y.Z" PR; merging that PR bumps pyproject.toml's
+# version, updates CHANGELOG.md, and pushes the tag + GitHub Release automatically. See
+# AGENTS.md's "How to work here" and CONTRIBUTING.md's "Releasing a version" section.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v5
+        with:
+          release-type: python
