@@ -21,6 +21,12 @@
   "initializeCommand": "test -f .devcontainer/claude-user-settings.json || echo '{}' > .devcontainer/claude-user-settings.json",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
 
+  // See template/.devcontainer/devcontainer.json.jinja for the full rationale — kept
+  // in sync manually since this file is deliberately not templated/symlinked.
+  "containerEnv": {
+    "GOOSE_MODE": "smart_approve"
+  },
+
   "mounts": [
     "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
     // Isolate chassis's own container settings.json from the shared ~/.claude mount

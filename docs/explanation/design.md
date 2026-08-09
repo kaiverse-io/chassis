@@ -19,7 +19,7 @@ from four documents. Each links to the section or ADR that earns it.
 |---|---|---|
 | **Determinism wraps non-determinism** | Agent output isn't deterministic; Governance/Guardrails/Ratchet exist to check it with things that are | [Determinism is the point of the Foundation group](#determinism-is-the-point-of-the-foundation-group) |
 | **Observe, advise, or gate — never intercept** | A cockpit tool may read after the fact, answer when asked, or block loudly — never silently rewrite what the agent perceives | [The harness plane](#the-harness-plane-what-chassis-will-and-wont-put-between-an-agent-and-its-context), [ADR-004](../decisions/adrs/adr-004-no-silent-rewriters.md) |
-| **Guarantees don't depend on the harness** | Bucket A/B enforcement (Guardrails, Ratchet) runs in CI/git regardless of what wrote the commit; Governance's hook mechanism and the Cockpit are Claude-Code-specific today — real, but not the safety floor | [Harness neutrality: what's guaranteed vs. what's Claude-enhanced](#harness-neutrality-whats-guaranteed-vs-whats-claude-enhanced) |
+| **Guarantees don't depend on the harness** | Bucket A/B enforcement (Guardrails, Ratchet) runs in CI/git regardless of what wrote the commit; Governance has a real adapter per harness (Claude Code, Codex CLI, goose), each trust-gated or coarser than CI — real, but still not the safety floor. The Cockpit remains Claude-Code-specific | [Harness neutrality: what's guaranteed vs. what's harness-specific](#harness-neutrality-whats-guaranteed-vs-whats-harness-specific) |
 | **Reduce the need to read, don't compress the symptom** | Token frugality comes from structure/recall/memory tools and native platform features, not from filtering what the agent sees | [The harness plane](#the-harness-plane-what-chassis-will-and-wont-put-between-an-agent-and-its-context) |
 | **Two planes, one job** | Chassis is Plane 1 (how the software gets built) only; Plane 2 (what it does once shipped) is the product's own architecture, never chassis's | [The two planes](#the-two-planes) |
 | **Own your prompts, own your context window** | Of 12-factor-agents' twelve factors, only F2 and F3 describe *any* agent's behavior — including the one building this repo — so they're the only two chassis claims | [The two planes](#the-two-planes) |
@@ -114,7 +114,7 @@ flowchart BT
     subgraph Foundation["Foundation — day 0, always active"]
         direction BT
         Substrate["<b>Substrate</b><br/>devcontainer: image → tools → cache volumes → host mounts"]
-        Governance["<b>Governance</b> — bucket A (blocking)<br/>permissions.allow · Forbidden Patterns · ask-before-destructive"]
+        Governance["<b>Governance</b> — bucket A (blocking)<br/>per-harness config (Claude/Codex/goose) · Forbidden Patterns"]
         Guardrails["<b>Guardrails</b> — bucket A (blocking)<br/>ruff · mypy · import-linter · opengrep · gitleaks · ARCHITECTURE.md coverage"]
         Prompts["<b>Prompts</b> — bucket A (blocking) · 12FA F2<br/>prompts/ convention, no-inline-literal rule"]
         Ratchet["<b>Ratchet</b> — bucket B (ratcheting)<br/>coverage floor · complexity ceiling"]
@@ -145,7 +145,7 @@ flowchart BT
 | Layer | Answers | 12FA anchor | Mechanism | Bucket |
 |---|---|---|---|---|
 | **Substrate** | What does this even run on? | — | Devcontainer's 4-sub-layer model: image → toolchain → cache volumes → host mounts | — |
-| **Governance** | Is the *agent* allowed to take this action? | — | `permissions.allow`, `AGENTS.md` Forbidden Patterns, ask-before-destructive conventions | A |
+| **Governance** | Is the *agent* allowed to take this action? | — | Per-harness config — `permissions.allow`/`deny` (Claude Code), `.codex/config.toml` + `.codex/rules/` (Codex CLI), `GOOSE_MODE` (goose) — plus `AGENTS.md` Forbidden Patterns; see [Harness neutrality](#harness-neutrality-whats-guaranteed-vs-whats-harness-specific) for what each actually guarantees | A |
 | **Guardrails** | Does the *code* meet the bar? | — | ruff, mypy, import-linter, opengrep self-weakening, gitleaks, `ARCHITECTURE.md` coverage (`just ci-arch`) | A |
 | **Prompts** | Where do prompts live, how are they versioned? | F2 — Own your Prompts | `prompts/` convention; no inline literal over 200 chars | A |
 | **Ratchet** | What quality bar only ever goes up? | — | Coverage floor (`coverage_fail_under` Copier answer → `fail_under` + `--cov-fail-under`, CI via `just ci-test`), complexity ceiling | B |
@@ -224,31 +224,56 @@ compaction, subagent isolation, progressive skill disclosure), which cover the s
 interceptor tools without anyone rewriting the agent's observations. Fix the cause of
 re-reading; don't compress the symptom.
 
-## Harness neutrality: what's guaranteed vs. what's Claude-enhanced
+## Harness neutrality: what's guaranteed vs. what's harness-specific
 
 Chassis's goal is that a project's safety and quality floor must not depend on
 which harness or model an agent happens to run — goose, Codex, Cursor, and
 Claude Code are meant to be interchangeable. Today, only part of chassis
-earns that claim.
+earns that claim unconditionally; the rest has a real adapter per harness,
+each with its own honestly-documented caveat.
 
 **Universal, because it runs outside any harness:** Guardrails (ruff, mypy,
 import-linter, gitleaks, `ARCHITECTURE.md` coverage) and Ratchet (coverage
 floor) execute in CI and pre-commit — they check the diff, not who or what
 produced it. A commit from any harness, or no harness at all, hits the same
-gate.
+gate. This is the actual floor; nothing below it is a substitute.
 
-**Claude-specific, today:** Governance's actual mechanism
-(`.claude/settings.json` `permissions.allow`/`deny`, the SessionStart-injected
-cockpit reminder) and `/dev-coach`'s loop-closing half are Claude Code
-constructs — they enforce nothing in goose, Codex, or Cursor sessions.
-`AGENTS.md` is harness-neutral by convention (the open standard); whether an
-agent actually *obeys* it without a hook behind it is up to that harness.
+**Harness-specific, with real caveats — not yet universal:** Governance now
+has an adapter for three harnesses — `.claude/settings.json`
+(`permissions.allow`/`deny`, Claude Code), `.codex/config.toml` +
+`.codex/rules/` (`approval_policy`, `sandbox_mode`, and a best-effort
+`--no-verify` denial, Codex CLI), and `GOOSE_MODE` via the devcontainer's
+`containerEnv` (goose) — but none of the three is unconditional the way
+Guardrails/Ratchet are:
+
+- Claude Code's and Codex's project-scoped config only takes effect after a
+  human has manually trusted this specific project on their own machine
+  (Codex's own docs: "if you mark a project as untrusted, Codex skips
+  project-scoped `.codex/` layers"; Claude Code: the workspace-trust dialog)
+  — a repo can never pre-trust itself for either.
+  goose has no project-scoped config file at all; `GOOSE_MODE` is a
+  container-wide environment default, reachable only inside this project's
+  own devcontainer, and coarser than the other two — a session-wide posture,
+  not a per-command allow/deny list.
+- Codex's `--no-verify` denial is a strict positional-prefix match, not a
+  substring-anywhere glob like Claude Code's `Bash(*--no-verify*)` — see
+  `.codex/rules/default.rules`'s own comment for exactly what it does and
+  doesn't catch.
+
+The AI-usage cockpit (the `SessionStart`-injected reminder, `/dev-coach`'s
+loop-closing half) remains Claude-Code-specific — it reads Claude Code's own
+session/memory format, which goose and Codex don't produce. `AGENTS.md` is
+harness-neutral by convention (the open standard); whether an agent actually
+*obeys* it without a hook behind it is up to that harness.
 
 The rule this implies: never design a safety property that only holds because
-a Claude-Code hook fired. If it matters, it belongs in bucket A/B (CI, git) —
+one harness's hook fired. If it matters, it belongs in bucket A/B (CI, git) —
 genuinely harness-independent — not in Governance-via-hook or bucket C, where
-"advisory in Claude Code" is not a synonym for "guaranteed everywhere else
-too."
+"a harness-specific config enforces this" is not a synonym for "guaranteed
+everywhere else too." See
+[ADR-006](../decisions/adrs/adr-006-harness-neutral-governance-adapters.md)
+for why goose only gets environment-level enforcement and the full reasoning
+behind each harness's adapter shape.
 
 ## The thin-chassis discipline
 

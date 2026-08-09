@@ -1,19 +1,15 @@
 #!/usr/bin/env bash
 # arch-review/SKILL.md contains {{ python_package_name }} but historically shipped
 # without a .jinja suffix, so Copier copied it verbatim instead of rendering it.
+# Canonical source is .agents/skills/ (the SKILL.md open standard) — .claude/skills
+# is only ever a symlink into it (see preserve-symlinks-skills.sh), so checking the
+# canonical path alone covers both.
 set -euo pipefail
 tmpdir="$1"
 
-skill_file=""
-for candidate in \
-  "$tmpdir/.agents/skills/arch-review/SKILL.md" \
-  "$tmpdir/.claude/skills/arch-review/SKILL.md"
-do
-  [ -f "$candidate" ] && skill_file="$candidate" && break
-done
-
-[ -n "$skill_file" ] || {
-  echo "FAIL: no arch-review SKILL.md found in stamped output at either canonical path"
+skill_file="$tmpdir/.agents/skills/arch-review/SKILL.md"
+test -f "$skill_file" || {
+  echo "FAIL: no arch-review SKILL.md at $skill_file in stamped output"
   exit 1
 }
 

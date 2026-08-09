@@ -119,13 +119,18 @@ if ! command -v gitleaks >/dev/null 2>&1; then
   # renovate: datasource=github-releases depName=gitleaks/gitleaks extractVersion=^v(?<version>.*)$
   GITLEAKS_VERSION="8.21.2"
   ARCH=$(uname -m)
-  case "$ARCH" in arm64|aarch64) GA="arm64" ;; *) GA="x64" ;; esac
-  TMP=$(mktemp -d)
-  curl -LsSf \
-    "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_${GA}.tar.gz" \
-    | tar -xz -C "$TMP" gitleaks
-  mv "$TMP/gitleaks" "$HOME/.local/bin/gitleaks"
-  rm -rf "$TMP"
+  case "$ARCH" in arm64|aarch64) GA="arm64" ;; x86_64) GA="x64" ;; *) GA="" ;; esac
+  if [ -n "$GA" ]; then
+    TMP=$(mktemp -d)
+    curl -LsSf \
+      "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_${GA}.tar.gz" \
+      | tar -xz -C "$TMP" gitleaks \
+      && mv "$TMP/gitleaks" "$HOME/.local/bin/gitleaks" \
+      || echo "[warn] gitleaks install failed — install manually from https://github.com/gitleaks/gitleaks/releases"
+    rm -rf "$TMP"
+  else
+    echo "[warn] no prebuilt gitleaks asset for $ARCH — install manually from https://github.com/gitleaks/gitleaks/releases"
+  fi
 fi
 
 # ── opengrep (semantic lint / self-weakening rules) ───────────────────────────
@@ -134,11 +139,20 @@ if ! command -v opengrep >/dev/null 2>&1; then
   # renovate: datasource=github-releases depName=opengrep/opengrep extractVersion=^v(?<version>.*)$
   OPENGREP_VERSION="1.26.0"
   ARCH=$(uname -m)
-  case "$ARCH" in arm64|aarch64) OG_ASSET="opengrep_manylinux_aarch64" ;; *) OG_ASSET="opengrep_manylinux_x86" ;; esac
-  curl -LsSf \
-    "https://github.com/opengrep/opengrep/releases/download/v${OPENGREP_VERSION}/${OG_ASSET}" \
-    -o "$HOME/.local/bin/opengrep"
-  chmod +x "$HOME/.local/bin/opengrep"
+  case "$ARCH" in
+    arm64|aarch64) OG_ASSET="opengrep_manylinux_aarch64" ;;
+    x86_64)        OG_ASSET="opengrep_manylinux_x86" ;;
+    *)             OG_ASSET="" ;;
+  esac
+  if [ -n "$OG_ASSET" ]; then
+    curl -LsSf \
+      "https://github.com/opengrep/opengrep/releases/download/v${OPENGREP_VERSION}/${OG_ASSET}" \
+      -o "$HOME/.local/bin/opengrep" \
+      && chmod +x "$HOME/.local/bin/opengrep" \
+      || echo "[warn] opengrep install failed — install manually from https://github.com/opengrep/opengrep/releases"
+  else
+    echo "[warn] no prebuilt opengrep asset for $ARCH — install manually from https://github.com/opengrep/opengrep/releases"
+  fi
 fi
 
 # ── Claude Code CLI ────────────────────────────────────────────────────────────

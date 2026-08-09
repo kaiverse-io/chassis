@@ -15,10 +15,12 @@ rules:
         - "**/CONTRIBUTING.md*"
         - ".opengrep/**"
         - "template/.opengrep/**"
-        # The permissions.deny rule that blocks --no-verify necessarily contains the
-        # literal string it blocks — this is the rule's own enforcement, not a violation.
+        # The permissions.deny rule / Codex prefix_rule that blocks --no-verify necessarily
+        # contains the literal string it blocks — this is the rule's own enforcement, not
+        # a violation.
         - "**/settings.json.jinja"
         - ".claude/settings.json"
+        - "**/.codex/rules/**"
     metadata:
       category: security
       technology: [git]
