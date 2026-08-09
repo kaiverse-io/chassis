@@ -31,9 +31,9 @@ last_reviewed: 2026-07-08
 Working with coding agents (Claude Code or otherwise) generates real signal about where the
 agent wastes tokens, repeats corrections, or gets lost — but only if something captures it.
 Before this ADR, that signal was scattered and mostly implicit: `codeburn`/`abtop`/AI Engineer
-Coach existed (v0.3.0) but only as isolated bucket-C installs, and `/dev-coach` (ADR-016 in
-project AGENTS.md, chassis-side) only read memory files and `git log` — a narrow proxy that
-misses anything the agent didn't choose to write down.
+Coach existed (v0.3.0) but only as isolated bucket-C installs, and `/dev-coach` only read
+memory files and `git log` — a narrow proxy that misses anything the agent didn't choose to
+write down.
 
 Three more tools close real gaps in that signal, and were validated by hand (installed, run,
 inspected) in a live devcontainer before being templated here — not templated on the strength of

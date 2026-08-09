@@ -5,9 +5,11 @@
 [![Release](https://img.shields.io/github/v/release/kaiverse-io/chassis?display_name=tag)](https://github.com/kaiverse-io/chassis/releases)
 [![CI](https://github.com/kaiverse-io/chassis/actions/workflows/ci.yml/badge.svg)](https://github.com/kaiverse-io/chassis/actions/workflows/ci.yml)
 
-**A [Copier](https://copier.readthedocs.io/) template that stamps AI-native Python projects with guardrails from commit 1** — not bolted on after an agent has already shipped a few hundred unguarded lines.
+**chassis exists so a project's safety and quality floor doesn't depend on which harness or LLM the agent working on it happens to be** — a [Copier](https://copier.readthedocs.io/) template that stamps AI-native Python projects with guardrails from commit 1, not bolted on after an agent has already shipped a few hundred unguarded lines.
 
 Stamp once; every gate is already there. Improve the chassis; `copier update` flows the change into every stamped project as a real diff. Full reasoning: [design doc](docs/explanation/design.md).
+
+That guarantee currently has two tiers, and we'd rather say so than overclaim it. What runs in CI and git — Guardrails, Ratchet — holds no matter which agent, harness, or human touched the repo: it checks the diff, not who wrote it. What runs through Claude Code's own hooks and settings — Governance's live enforcement, the AI-usage cockpit — is a real, working enhancement today, but only for that one harness. See [Harness neutrality: what's guaranteed vs. what's Claude-enhanced](docs/explanation/design.md#harness-neutrality-whats-guaranteed-vs-whats-claude-enhanced) for the exact split and where it's headed.
 
 ## Quick start
 
@@ -34,7 +36,7 @@ copier update --trust    # pulls the latest *tag*, not main HEAD
 |---|---|---|
 | **A — Guardrails** | Blocks commit / CI when wrong is always wrong | `AGENTS.md`, ruff + mypy, import-linter slot, opengrep self-weakening + prompts-as-code, gitleaks, conventional commits, CODEOWNERS, Diátaxis docs, `prompts/` convention, `ARCHITECTURE.md` coverage (`just ci-arch`), 4-layer devcontainer |
 | **B — Ratcheting** | Present from day one; thresholds only rise | Coverage floor (`coverage_fail_under`, default `0`), complexity ceiling |
-| **C — On-demand** | Installed, never blocking | [AI-usage cockpit](docs/explanation/ai-usage-cockpit.md): `codeburn`, `abtop`, AI Engineer Coach, `graphify`, `ctx`; `/arch-review` skill |
+| **C — On-demand** | Installed, never blocking | [AI-usage cockpit](docs/explanation/ai-usage-cockpit.md): `codeburn`, `abtop`, AI Engineer Coach, `graphify`, `ctx`; `/arch-review` and `/dev-coach` skills *(their signal-capture tools are agent-agnostic; the loop-closing skills themselves are Claude-Code-native today)* |
 | **D — Wired-but-waiting** | Slot exists; no-op until input exists | `evals/` gate, ADLC agent-change gate |
 
 The cockpit closes the loop: session history (`ctx`), cost/context (`codeburn` / `abtop`), codebase graph (`graphify`), and `/dev-coach` turning signal into durable `AGENTS.md` rules — asked-for, never silent.

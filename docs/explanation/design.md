@@ -19,6 +19,7 @@ from four documents. Each links to the section or ADR that earns it.
 |---|---|---|
 | **Determinism wraps non-determinism** | Agent output isn't deterministic; Governance/Guardrails/Ratchet exist to check it with things that are | [Determinism is the point of the Foundation group](#determinism-is-the-point-of-the-foundation-group) |
 | **Observe, advise, or gate — never intercept** | A cockpit tool may read after the fact, answer when asked, or block loudly — never silently rewrite what the agent perceives | [The harness plane](#the-harness-plane-what-chassis-will-and-wont-put-between-an-agent-and-its-context), [ADR-004](../decisions/adrs/adr-004-no-silent-rewriters.md) |
+| **Guarantees don't depend on the harness** | Bucket A/B enforcement (Guardrails, Ratchet) runs in CI/git regardless of what wrote the commit; Governance's hook mechanism and the Cockpit are Claude-Code-specific today — real, but not the safety floor | [Harness neutrality: what's guaranteed vs. what's Claude-enhanced](#harness-neutrality-whats-guaranteed-vs-whats-claude-enhanced) |
 | **Reduce the need to read, don't compress the symptom** | Token frugality comes from structure/recall/memory tools and native platform features, not from filtering what the agent sees | [The harness plane](#the-harness-plane-what-chassis-will-and-wont-put-between-an-agent-and-its-context) |
 | **Two planes, one job** | Chassis is Plane 1 (how the software gets built) only; Plane 2 (what it does once shipped) is the product's own architecture, never chassis's | [The two planes](#the-two-planes) |
 | **Own your prompts, own your context window** | Of 12-factor-agents' twelve factors, only F2 and F3 describe *any* agent's behavior — including the one building this repo — so they're the only two chassis claims | [The two planes](#the-two-planes) |
@@ -222,6 +223,32 @@ repeat-reads into durable rules) — plus the harness's own native mechanisms (p
 compaction, subagent isolation, progressive skill disclosure), which cover the same ground as
 interceptor tools without anyone rewriting the agent's observations. Fix the cause of
 re-reading; don't compress the symptom.
+
+## Harness neutrality: what's guaranteed vs. what's Claude-enhanced
+
+Chassis's goal is that a project's safety and quality floor must not depend on
+which harness or model an agent happens to run — goose, Codex, Cursor, and
+Claude Code are meant to be interchangeable. Today, only part of chassis
+earns that claim.
+
+**Universal, because it runs outside any harness:** Guardrails (ruff, mypy,
+import-linter, gitleaks, `ARCHITECTURE.md` coverage) and Ratchet (coverage
+floor) execute in CI and pre-commit — they check the diff, not who or what
+produced it. A commit from any harness, or no harness at all, hits the same
+gate.
+
+**Claude-specific, today:** Governance's actual mechanism
+(`.claude/settings.json` `permissions.allow`/`deny`, the SessionStart-injected
+cockpit reminder) and `/dev-coach`'s loop-closing half are Claude Code
+constructs — they enforce nothing in goose, Codex, or Cursor sessions.
+`AGENTS.md` is harness-neutral by convention (the open standard); whether an
+agent actually *obeys* it without a hook behind it is up to that harness.
+
+The rule this implies: never design a safety property that only holds because
+a Claude-Code hook fired. If it matters, it belongs in bucket A/B (CI, git) —
+genuinely harness-independent — not in Governance-via-hook or bucket C, where
+"advisory in Claude Code" is not a synonym for "guaranteed everywhere else
+too."
 
 ## The thin-chassis discipline
 
