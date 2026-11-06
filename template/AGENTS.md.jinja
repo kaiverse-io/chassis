@@ -65,11 +65,19 @@ matching `## <Name>` section in `ARCHITECTURE.md`: purpose, public interface, de
 plain (untagged) fenced code block. Hand-drawn, not Mermaid: a diagram you redraw in the same PR
 as the code change, not a separate rendering step.
 
-- `just ci-arch` blocks CI if a component has no section — mechanical presence only.
+`ARCHITECTURE.md` carries two diagrams above the per-component sections: the **System
+Overview** (runtime view — data/control flow, external services included) and the **Component
+Diagram** (static view — one box per top-level component, an arrow wherever one imports
+another; it should agree with `.importlinter`). Redraw the Component Diagram in the same PR that
+adds, removes or re-wires a component.
+
+- `just ci-arch` blocks CI if a component has no section, or no box in the Component Diagram —
+  mechanical presence only.
 - It does **not** verify the content still matches the code. Run `/arch-review`
   (`.agents/skills/arch-review/SKILL.md`) periodically, or after a PR that changes a documented
   component's behavior, to catch drift the coverage check can't see.
-- Add the component's section in the **same PR** that adds the component — don't defer it.
+- Add the component's section and its Component Diagram box in the **same PR** that adds the
+  component — don't defer it.
 
 ## Agent-memory convention
 

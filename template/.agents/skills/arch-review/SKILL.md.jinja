@@ -30,11 +30,36 @@ silently.
      doc's number.
    - Diagram: confirm every box in the diagram still corresponds to something real, and that
      nothing load-bearing added since is missing from it.
+   - Component Diagram (the `## Component Diagram` section): derive the real edge list with
+     [grimp](https://github.com/python-grimp/grimp) — the import-graph library import-linter
+     is built on, so it is already installed — rather than grepping imports by hand:
+     ```bash
+     uv run python - <<'PY'
+     import grimp
+     pkg = "{{ python_package_name }}"
+     g = grimp.build_graph(pkg)
+     top = sorted({m.split(".")[1] for m in g.modules if m.count(".") >= 1})
+     for a in top:
+         for b in top:
+             if a != b and g.direct_import_exists(
+                 importer=f"{pkg}.{a}", imported=f"{pkg}.{b}", as_packages=True
+             ):
+                 print(f"{a} ──▶ {b}")
+     PY
+     ```
+     Compare that list with the drawn arrows, both directions (drawn-but-absent,
+     present-but-undrawn). Cross-check `.importlinter`: an arrow
+     a contract forbids is a finding even if the import exists. `just ci-arch` only proves each
+     component has a box; whether the arrows are true is this step's job.
+   - Missing internal diagram: flag a component section with no diagram whose flow is not
+     obvious from its name — several functions calling each other, a loop, a state machine,
+     or I/O across more than one boundary.
 
 3. **Classify each finding.** Split into:
    - **Stale** — the doc describes something that changed (rename, removed, behavior differs).
    - **Missing** — real behavior/dependency/symbol with no mention anywhere in the section.
-   - **Diagram drift** — the ASCII diagram itself is now wrong or incomplete.
+   - **Diagram drift** — an ASCII diagram (a component's own, or the Component Diagram's
+     arrows) is now wrong or incomplete, or a non-obvious component has none.
 
 4. **Report, then ask.** Present findings grouped by component, each with the specific claim,
    what the source actually shows, and the file:line evidence. Ask before editing
