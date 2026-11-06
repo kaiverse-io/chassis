@@ -167,6 +167,8 @@ monitor:
 coach:
     @echo "Run '/dev-coach' in Claude Code, or see .agents/skills/dev-coach/SKILL.md"
 
+{%- if include_ub_mode %}
+
 # ── Code-quality gates for /ub-mode (bucket C, on-demand) ────────────────────
 # unclebob/crapper, /dryer, /mutator — CRAP score, structural duplication, mutation testing.
 # Pinned to a commit, not a release: upstream publishes none, so (like AEC_COMMIT) bumping a pin
@@ -207,3 +209,4 @@ dry *args="src": ub-tools
 mutate +paths: ub-tools
     {{ ub_tools }}/mutator/mutator {{ paths }}
 {%- endraw %}
+{%- endif %}
