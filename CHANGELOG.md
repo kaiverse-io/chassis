@@ -9,6 +9,20 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
+## [0.14.0](https://github.com/kaiverse-io/chassis/compare/v0.13.0...v0.14.0) (2026-11-06)
+
+
+### Features
+
+* add opt-in ub-mode skill with pinned crap/dry/mutate quality gates ([f938d06](https://github.com/kaiverse-io/chassis/commit/f938d06fda37d78f9f745ae6c5f02c53eb43aaaa))
+* require a Component Diagram in ARCHITECTURE.md, views named after C4/arc42 ([82d743e](https://github.com/kaiverse-io/chassis/commit/82d743e756e5bf1199bb9d87f1744229a7140b66))
+* ub-mode skill + pinned quality gates; required Component Diagram (C4/arc42) ([1ab2f10](https://github.com/kaiverse-io/chassis/commit/1ab2f10580f34a82a9be445fad3bc430fb2060ea))
+
+
+### Bug Fixes
+
+* stop an empty .importlinter slot failing every fresh stamp's just ci ([e4ae762](https://github.com/kaiverse-io/chassis/commit/e4ae762f363e74b4644a4836c01d2dfa6f860320))
+
 ## [0.13.0](https://github.com/kaiverse-io/chassis/compare/v0.12.0...v0.13.0) (2026-08-09)
 
 
