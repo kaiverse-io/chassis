@@ -11,7 +11,7 @@ trap 'rm -rf "$work"' EXIT
 cp -a "$tmpdir/." "$work/"
 cd "$work"
 
-line=$(grep -m1 "importlinter:contract:' .importlinter" justfile | sed 's/^[[:space:]]*@//')
+line="just _lint-imports"
 test -n "$line" || { echo "FAIL: ci-lint has no guarded lint-imports line"; exit 1; }
 
 bash -c "$line" >/dev/null 2>&1 || { echo "FAIL: empty .importlinter slot fails ci-lint's import check"; exit 1; }

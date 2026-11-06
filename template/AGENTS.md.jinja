@@ -39,7 +39,11 @@ docs/decisions/adrs/             — MADR decision records
 
 ## How to work here
 
-- `just ci` before every push — runs lint, type-check, import boundaries, tests, docs, architecture coverage.
+- `just ci` after each logical change — it is exactly what CI runs: lint, type-check, import
+  boundaries, shell lint, file-size and gate-integrity checks, tests, docs links, architecture
+  coverage. Don't invent a second linter run; fix what `just ci` reports.
+- `just verify` before saying a task is done. It starts as `just ci`; the project extends it with
+  what "ran it like a user" means here.
 - `just fmt` to auto-format (ruff format + ruff check --fix).
 - `just sync` after changing `pyproject.toml`.
 - Conventional commits enforced: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`.
@@ -112,7 +116,7 @@ explicitly trust this project on their machine before it does anything at all:
 
 None of the three is a substitute for the others, and none is a substitute for CI.
 Stamping a config file is necessary, never sufficient. See
-[docs/explanation/design.md](docs/explanation/design.md#harness-neutrality-whats-guaranteed-vs-whats-harness-enhanced)
+[chassis's docs/explanation/design.md](https://github.com/kaiverse-io/chassis/blob/main/docs/explanation/design.md#harness-neutrality-whats-guaranteed-vs-whats-harness-specific)
 for the full reasoning.
 
 <!-- cockpit-section:start (kept in sync with chassis's own root AGENTS.md — see justfile ci-lint) -->
