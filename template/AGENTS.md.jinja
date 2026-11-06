@@ -7,7 +7,7 @@ last_reviewed: <!-- update when reviewing -->
 # {{ project_name }} — Agent Context
 
 > **Canonical agent context** (AGENTS.md open standard — Linux Foundation AAIF).
-> `CLAUDE.md` is a symlink to this file. Update here; the symlink follows.
+> `CLAUDE.md` imports this file (`@AGENTS.md`), and Codex reads it directly. Update here only.
 
 {{ description }}
 
@@ -16,16 +16,18 @@ last_reviewed: <!-- update when reviewing -->
 ```
 ARCHITECTURE.md                  — component docs; just ci-arch enforces coverage (see below)
 src/{{ python_package_name }}/   — application source (see import contracts in .importlinter)
-tests/                           — pytest suite
+tests/                           — pytest suite; tests/boundary/ = behaviour contracts that survive a rewrite (slot)
 prompts/                         — versioned prompt artifacts (never inline — see prompts/README.md)
 evals/                           — eval harness slot (wired-but-waiting; see evals/README.md)
 docs/tutorials/                  — learning-oriented guides
-docs/how-to/                     — task-oriented recipes
+docs/how-to/                     — task-oriented recipes (review-agent-changes.md: who reviews agent PRs)
+docs/feature-map.md              — feature → entry point → code → tests; start here to find where to change
 docs/reference/                  — API / config reference
 docs/explanation/                — concepts and theory
 docs/decisions/adrs/             — MADR decision records
 .opengrep/rules/                 — custom semantic lint rules (self-weakening + prompts-as-code + project)
 .agents/skills/                  — reusable agent skills (SKILL.md open standard; .claude/skills/ symlinks here)
+.mcp.json                        — the only MCP servers agents may use here; reviewed (CODEOWNERS)
 .agents/memory/                  — agent memory, git-tracked (~/.claude/…/memory symlinks here; post-create recreates it)
 ```
 

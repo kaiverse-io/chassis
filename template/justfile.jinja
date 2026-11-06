@@ -28,6 +28,7 @@ ci-lint:
     @files=$(find . -name '*.sh' -not -path './.venv/*' -not -path './.cache/*' -not -path './node_modules/*'); [ -z "$files" ] || uvx --from shellcheck-py==0.10.0.1 shellcheck $files
     @just _ci-file-size
     @just _ci-gate-integrity
+    @just _ci-agents-size
 
 ci-test:
     uv run pytest
@@ -124,6 +125,21 @@ _ci-file-size:
     for p, n in over:
         print(f"::error file={p}::{p} has {n} lines (limit {limit}) — split it by responsibility", file=sys.stderr)
     sys.exit(1 if over else 0)
+
+# Every session loads AGENTS.md before doing anything, so each line costs context on every task.
+# Keep it an index that points at docs/, not the docs themselves. Raising the limit is a reviewed
+# change (CODEOWNERS).
+max_agents_lines := "200"
+
+[private]
+_ci-agents-size:
+    #!/usr/bin/env python3
+    import pathlib, sys
+    limit = int("{% raw %}{{ max_agents_lines }}{% endraw %}")
+    n = len(pathlib.Path("AGENTS.md").read_text().splitlines())
+    if n > limit:
+        print(f"::error file=AGENTS.md::AGENTS.md has {n} lines (limit {limit}) — move detail into docs/ and link it", file=sys.stderr)
+        sys.exit(1)
 
 # The checks an agent runs locally and the checks CI runs must be the same list. Fails when
 # .github/workflows/ci.yaml runs a `just` step that `ci` does not list, or skips one it does.
