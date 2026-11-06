@@ -7,7 +7,7 @@ last_reviewed: 2026-11-06
 
 # ADR-008 — Ship ub-mode as an opt-in skill, with its quality tools pinned behind `just`
 
-- **Status:** Accepted (2026-11-06)
+- **Status:** Accepted (2026-11-06); amended 2026-11-06 — opt-in via `include_ub_mode`, default off (see Amendment)
 - **Deciders:** founder
 
 ## Context
@@ -73,3 +73,14 @@ in a stamped project). Upstream is new; pins will need deliberate attention.
 **Follow-up:** once a stamped project passes `just crap` cleanly, promote CRAP < 10 to a
 blocking ratchet in `just ci`, the same way the coverage floor works — a separate decision,
 not taken here.
+
+## Amendment (2026-11-06): opt-in at stamp time
+
+v0.14.0 stamped the skill and the four recipes into every project. That contradicts
+chassis#10's mutation-testing row ("Optional, off by default … Do not make `/ub-mode` part of
+every stamp"), which records a 2026-10-31 spike at 52% of mutants killed on one file and calls
+the full ritual heavy. The skill, the `ub-tools`/`crap`/`dry`/`mutate` recipes and their
+`.gitignore` lines are now behind the Copier question `include_ub_mode` (default `false`), the
+same shape as `install_ai_coach`. A project stamped at v0.14.0 keeps what it has until its next
+`copier update`, which removes them unless it answers `include_ub_mode=true`.
+
