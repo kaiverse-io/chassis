@@ -9,6 +9,14 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
+## [0.14.1](https://github.com/kaiverse-io/chassis/compare/v0.14.0...v0.14.1) (2026-11-06)
+
+
+### Bug Fixes
+
+* make ub-mode opt-in at stamp time (include_ub_mode, default off) ([0598736](https://github.com/kaiverse-io/chassis/commit/0598736d1245700a885482aea8b5f09a31f41fe5))
+* make ub-mode opt-in at stamp time (include_ub_mode, default off) ([eb53a4c](https://github.com/kaiverse-io/chassis/commit/eb53a4c04e1dec4e8c6fc7a7c8d07a5601ed5fa2))
+
 ## [0.14.0](https://github.com/kaiverse-io/chassis/compare/v0.13.0...v0.14.0) (2026-11-06)
 
 
