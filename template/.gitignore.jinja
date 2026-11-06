@@ -49,7 +49,10 @@ graphify-out/
 # pin one developer's prefs onto everyone.
 .devcontainer/claude-user-settings.json
 
+{%- if include_ub_mode %}
+
 # /ub-mode quality tools (just crap|dry|mutate): pinned tool checkouts and their reports
 .cache/ub-tools/
 .metrics/
 target/coverage/
+{%- endif %}
