@@ -1,10 +1,22 @@
 # {{ project_name }} Architecture
 
 > Hand-maintained, not generated. `just ci-arch` fails CI if a top-level module/package under
-> `src/{{ python_package_name }}/` has no matching section here — see `AGENTS.md` "Architecture
-> documentation". Diagrams are plain ASCII/Unicode box-drawing text in an untagged fenced code
-> block, not Mermaid — a diagram you can update in the same PR as the code, not a separate
-> rendering step.
+> `src/{{ python_package_name }}/` has no matching section here, or no box in the Component
+> Diagram — see `AGENTS.md` "Architecture documentation". Diagrams are plain ASCII/Unicode
+> box-drawing text in an untagged fenced code block, not Mermaid — a diagram you can update in
+> the same PR as the code, not a separate rendering step.
+>
+> The views follow the [C4 model](https://c4model.com/) levels (which is notation-independent,
+> so plain text is a valid rendering) and [arc42](https://arc42.org/overview)'s view names:
+>
+> | Section | C4 level | arc42 view |
+> |---|---|---|
+> | System Overview | Context + Container | §3 Context and Scope, §6 Runtime View |
+> | Component Diagram | Component | §5 Building Block View, level 1 |
+> | A component's own diagram | Code (only where it earns it) | §5 Building Block View, level 2 |
+>
+> Every diagram: a one-line title saying what it shows, one notation throughout, and a label on
+> any arrow whose meaning isn't obvious (`──reads──▶`, `──HTTP──▶`).
 
 ## Executive Summary
 
@@ -15,24 +27,53 @@
 
 ## System Overview
 
+Runtime view: how a request or event moves through the running system, including everything
+outside it.
+
 ```
 <!-- Redraw this whenever a top-level component is added, removed, or its role changes.
-     Boxes for each component + external dependency (database, queue, third-party API),
-     arrows for the actual data/control flow between them. -->
+     Boxes for each component + external dependency (database, queue, third-party API) and
+     the people or systems that use this one, arrows for the actual data/control flow between
+     them. If where it runs matters (sandbox, container, proxy), show that boundary too —
+     arc42's §7 Deployment View, folded in here rather than a separate section. -->
+```
+
+## Component Diagram
+
+Static view: which top-level component under `src/{{ python_package_name }}/` depends on which.
+One box per component, an arrow `A ──▶ B` wherever `A` imports `B`; external services stay in
+the System Overview above. This is the diagram `.importlinter`'s contracts should agree with — a
+forbidden import is an arrow that must not exist here.
+
+`just ci-arch` checks that every top-level component is named inside this section's fenced block,
+so a new component cannot land without a box. It does not check the arrows; `/arch-review` does.
+
+```
+<!-- e.g.
+   ┌────────┐      ┌────────┐      ┌────────┐
+   │  cli   │ ───▶ │ core   │ ───▶ │ store  │
+   └────────┘      └────────┘      └────────┘
+-->
 ```
 
 ## Components
 
 Each top-level module or package directly under `src/{{ python_package_name }}/` gets a `##`
 section below: what it's for, its public interface, what it depends on, and — if its internal
-flow isn't obvious from the name — a small ASCII diagram. `just ci-arch` only checks that the
+flow isn't obvious from the name — a small ASCII diagram of that flow (the Component Diagram
+above shows how components relate; this one shows what happens inside one). `just ci-arch` only checks that the
 section exists (mechanical coverage); it does not verify the content still matches the code. Run
 the `/arch-review` skill (`.agents/skills/arch-review/SKILL.md`) periodically, or after a PR that
 changes a documented component's behavior, to catch drift a coverage check can't.
 
-<!-- ### <ModuleName>
+<!-- ## <ModuleName>
 Purpose: …
-Depends on: …
+Public interface: …
+Depends on: …   (must match its arrows in the Component Diagram)
+
+```
+<internal flow, if it isn't obvious from the name>
+```
 -->
 
 ## Known Limitations
