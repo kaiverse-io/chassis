@@ -7,3 +7,14 @@
 
 # ADRs require explicit sign-off
 docs/decisions/   @{{ github_owner }}
+
+# The gates themselves. An agent that can edit the check can make any change pass it, so a
+# change here needs the owner's review, not just a green build (chassis#10).
+justfile                  @{{ github_owner }}
+.github/workflows/        @{{ github_owner }}
+.pre-commit-config.yaml   @{{ github_owner }}
+.opengrep/                @{{ github_owner }}
+.importlinter             @{{ github_owner }}
+pyproject.toml            @{{ github_owner }}
+.claude/settings.json     @{{ github_owner }}
+.codex/                   @{{ github_owner }}

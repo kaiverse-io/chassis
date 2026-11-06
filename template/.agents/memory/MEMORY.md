@@ -1,4 +1,4 @@
 # Memory index
 
-<!-- One line per memory file:  - [Title](slug.md) — one-line hook -->
+<!-- One line per memory file, in the form `- [Title](slug.md) — one-line hook` -->
 <!-- See AGENTS.md "Agent-memory convention". Commit this dir to persist memory across rebuilds. -->

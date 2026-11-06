@@ -13,7 +13,8 @@ just ci          # run all checks
 
 | Command | What it does |
 |---|---|
-| `just ci` | Full CI: lint + type-check + test + docs |
+| `just ci` | Exactly what CI runs: lint, types, import boundaries, shell lint, file size, gate integrity, tests, docs links, architecture coverage |
+| `just verify` | Run before calling a task done: `just ci` plus the project's own end-to-end checks |
 | `just fmt` | Auto-format (ruff) |
 | `just sync` | Sync deps with uv |
 | `just lint` | Run all pre-commit hooks |
