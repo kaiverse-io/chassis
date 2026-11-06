@@ -14,7 +14,9 @@ ci-lint:
     uv run ruff check .
     uv run ruff format --check .
     uv run mypy src/
-    uv run lint-imports
+    @# import-linter >= 2.16 exits 1 on a config with no contracts; the template ships the slot
+    @# empty ("No contracts = linter passes" — see .importlinter), so run it once one exists.
+    @if grep -q '^\[importlinter:contract:' .importlinter; then uv run lint-imports; else echo "import-linter: no contracts in .importlinter yet — nothing to check"; fi
     gitleaks detect --source . --verbose
     opengrep scan --config .opengrep/rules/ . --error --severity ERROR
 
