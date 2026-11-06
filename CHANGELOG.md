@@ -9,6 +9,16 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
+## [0.15.0](https://github.com/kaiverse-io/chassis/compare/v0.14.1...v0.15.0) (2026-11-06)
+
+
+### Features
+
+* deny one-way-door git commands, add reviewed .mcp.json and [#10](https://github.com/kaiverse-io/chassis/issues/10)'s slots ([46b3261](https://github.com/kaiverse-io/chassis/commit/46b3261016f0d5176f350f752c5d13d6843527d5))
+* deny one-way-door git commands, add reviewed .mcp.json and [#10](https://github.com/kaiverse-io/chassis/issues/10)'s slots ([a0f884e](https://github.com/kaiverse-io/chassis/commit/a0f884e15a5ac40a63562b0b6f80c8c2cb35188f))
+* make the agent's check the CI check, and make inert checks real ([0e43d9f](https://github.com/kaiverse-io/chassis/commit/0e43d9fe46e989df510b1699e40d1ea94ab8a857))
+* make the agent's check the CI check, and make inert checks real ([92063dd](https://github.com/kaiverse-io/chassis/commit/92063dd8cc931834d68d5b59b124f15191a5dce6))
+
 ## [0.14.1](https://github.com/kaiverse-io/chassis/compare/v0.14.0...v0.14.1) (2026-11-06)
 
 
