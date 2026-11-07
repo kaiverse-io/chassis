@@ -58,6 +58,11 @@ include_ub_mode:
   help: "Add the opt-in /ub-mode coding-discipline skill and its `just crap` / `just dry` / `just mutate` quality tools (unclebob/crapper, dryer, mutator, fetched at pinned commits on first use)? Off by default: mutation testing is heavy, and the skill is a style choice, not a guardrail every project needs (chassis ADR-008)."
   default: false
 
+include_security_audit:
+  type: bool
+  help: "Add Cloudflare's /security-audit skill (cloudflare/security-audit-skill, MIT, vendored verbatim at a pinned commit)? A six-phase, multi-agent audit where a second agent tries to disprove every finding before it is reported confirmed. Off by default: a full audit fans out many agents and is an on-demand review, not a gate (chassis ADR-012)."
+  default: false
+
 enable_release_automation:
   type: bool
   help: "Add automated release-PR + tagging via release-please? Opt-in — once enabled, merges to main accumulate into an auto-maintained release PR; merging *that* PR bumps pyproject.toml's version, updates CHANGELOG.md, and pushes a git tag + GitHub Release automatically. Off by default: not every stamped project wants versioned releases (e.g. an internal app, or one with an existing release process)."
