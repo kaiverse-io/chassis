@@ -9,6 +9,14 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
+## [0.16.0](https://github.com/kaiverse-io/chassis/compare/v0.15.0...v0.16.0) (2026-11-07)
+
+
+### Features
+
+* add opt-in /security-audit skill (cloudflare/security-audit-skill, vendored verbatim) ([d8125b7](https://github.com/kaiverse-io/chassis/commit/d8125b7fa6a36ca9486594d5f802ef7b017c67bc))
+* add opt-in /security-audit skill (cloudflare/security-audit-skill, vendored verbatim) ([907ad6b](https://github.com/kaiverse-io/chassis/commit/907ad6b83608d538eecab1e21bc4760576952073))
+
 ## [0.15.0](https://github.com/kaiverse-io/chassis/compare/v0.14.1...v0.15.0) (2026-11-06)
 
 
