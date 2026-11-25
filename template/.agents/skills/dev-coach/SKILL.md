@@ -1,3 +1,8 @@
+---
+name: dev-coach
+description: "Coaching loop that finds anti-patterns and unreflected corrections in session, memory and git data, then proposes AGENTS.md and skill improvements and asks before writing. Run periodically or right after a corrected mistake."
+---
+
 # Dev Coach
 
 > The chassis's coaching loop: anti-pattern detection + an AGENTS.md/skills auditor
@@ -26,9 +31,10 @@ skills — then asks before writing anything. It never edits silently.
    project. If not installed, say so and skip — don't block on it.
 
 2. **Scan recent memory for unreflected feedback.** Read every file under `.agents/memory/`
-   (the canonical, git-tracked location — check `MEMORY.md` for the index; on Claude Code
-   this is also reachable at `~/.claude/projects/<project-slug>/memory/`, a symlink
-   `post-create.sh` maintains into the same files, not a second copy). Don't filter by a
+   (project lessons, git-tracked and public — check `MEMORY.md` for the index). If Claude
+   Code's private auto-memory exists at `~/.claude/projects/<project-slug>/memory/`, read it
+   too, but read-only: it holds personal context, so quote nothing from it into the repo, and
+   propose an AGENTS.md rule from it only as a general rule. Don't filter by a
    specific `metadata.type` — treat any memory file describing a correction, convention, or
    constraint as in scope, whatever type label it carries. For each one, check whether its
    rule already appears in `AGENTS.md` (the "Hard rules", "Forbidden patterns", or "How to

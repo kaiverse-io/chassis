@@ -302,26 +302,26 @@ if command -v ctx >/dev/null 2>&1; then
   ctx setup >/dev/null 2>&1 || true
 fi
 
-# ── Agent memory durability ───────────────────────────────────────────────────
-# Canonical memory is git-tracked in-repo (.agents/memory). The conventional Claude
-# path lives on the ephemeral home overlay (the ~/.claude bind mount only persists on
-# LOCAL devcontainers, not remote/cloud ones), so recreate it as a symlink each build.
-# Mirrors the .claude/skills → .agents/skills pattern. Wrapped in a subshell: a
-# permission failure on the host-mounted ~/.claude (UID mismatch, restrictive bind
-# mount) must degrade to a warning, not abort the rest of this script (uv sync,
-# pre-commit install haven't run yet at this point).
+# ── Agent memory ──────────────────────────────────────────────────────────────
+# Deliberately NOT linked into ~/.claude/projects/<slug>/memory. Claude Code writes
+# personal context there (preferences, budgets, decisions about the operator's own work);
+# linking it to the git-tracked .agents/memory/ would commit it, and in a public project
+# publish it. .agents/memory/ is for project lessons an agent writes on purpose.
+# See AGENTS.md "Agent-memory convention".
+#
+# Earlier versions of this template did link it. Remove that link (the symlink only, never the
+# directory behind it) so a project stamped before this change stops committing private notes.
+# legacy-memory-link:start
 (
-  MEM_CANON="$PWD/.agents/memory"
   MEM_LINK="$HOME/.claude/projects/${PWD//\//-}/memory"
-  mkdir -p "$MEM_CANON"
-  if [ -e "$MEM_LINK" ] && [ ! -L "$MEM_LINK" ]; then
-    cp -rn "$MEM_LINK"/. "$MEM_CANON"/ 2>/dev/null || true   # rescue files written before relink
-    rm -rf "$MEM_LINK"
+  if [ -d "$PWD/.agents/memory" ] && [ -L "$MEM_LINK" ] \
+    && [ "$(readlink -f "$MEM_LINK")" = "$(readlink -f "$PWD/.agents/memory")" ]; then
+    rm -f "$MEM_LINK"
+    echo "→ removed the legacy memory symlink $MEM_LINK"
+    echo "[warn] review .agents/memory/ for personal notes Claude wrote through that link before you push — it is git-tracked."
   fi
-  mkdir -p "$(dirname "$MEM_LINK")"
-  ln -sfn "$MEM_CANON" "$MEM_LINK"
-  echo "→ agent memory linked: $MEM_LINK → $MEM_CANON"
-) || echo "[warn] agent memory symlink setup failed (often a ~/.claude bind-mount permission/UID mismatch) — .agents/memory/ is still there and git-tracked, just not auto-linked into ~/.claude/projects/.../memory this build. Safe to ignore or fix the mount permissions manually."
+) || echo "[warn] could not check for the legacy agent-memory symlink; look at ~/.claude/projects/ for a memory link into .agents/memory/ and remove it."
+# legacy-memory-link:end
 
 # ── Project setup ─────────────────────────────────────────────────────────────
 if [ -f pyproject.toml ]; then

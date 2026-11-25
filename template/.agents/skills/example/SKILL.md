@@ -1,3 +1,8 @@
+---
+name: example
+description: "Starter skill template. Replace or delete it, and say here when the agent should use the skill."
+---
+
 # Example Skill
 
 > This is a starter skill — replace or delete it.
