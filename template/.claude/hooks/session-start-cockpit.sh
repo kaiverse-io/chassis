@@ -14,6 +14,9 @@
 # (on-demand, never-blocking) tool that may not even be installed in this project.
 set -uo pipefail
 
+# Resolve paths from the project root, whatever directory the harness starts the hook in.
+if [ -n "${CLAUDE_PROJECT_DIR:-}" ]; then cd "$CLAUDE_PROJECT_DIR" 2>/dev/null || true; fi
+
 report="graphify-out/GRAPH_REPORT.md"
 refreshed=0
 if command -v graphify >/dev/null 2>&1; then
@@ -51,7 +54,7 @@ if [ -f .agents/skills/dev-coach/SKILL.md ]; then
 fi
 
 if [ -n "$lines" ]; then
-  printf 'AI-usage cockpit for this project (see AGENTS.md "AI-usage cockpit &\ncoaching" for the full writeup):\n%s' "$lines"
+  printf 'AI-usage cockpit for this project (detail in\ndocs/explanation/harness-and-cockpit.md):\n%s' "$lines"
 fi
 
 exit 0

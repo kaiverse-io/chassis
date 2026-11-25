@@ -308,6 +308,19 @@ fi
 # linking it to the git-tracked .agents/memory/ would commit it, and in a public project
 # publish it. .agents/memory/ is for project lessons an agent writes on purpose.
 # See AGENTS.md "Agent-memory convention".
+#
+# Earlier versions of this template did link it. Remove that link (the symlink only, never the
+# directory behind it) so a project stamped before this change stops committing private notes.
+# legacy-memory-link:start
+(
+  MEM_LINK="$HOME/.claude/projects/${PWD//\//-}/memory"
+  if [ -L "$MEM_LINK" ] && [ "$(readlink -f "$MEM_LINK")" = "$(readlink -f "$PWD/.agents/memory")" ]; then
+    rm -f "$MEM_LINK"
+    echo "→ removed the legacy memory symlink $MEM_LINK"
+    echo "[warn] review .agents/memory/ for personal notes Claude wrote through that link before you push — it is git-tracked."
+  fi
+) || echo "[warn] could not check for the legacy agent-memory symlink; look at ~/.claude/projects/ for a memory link into .agents/memory/ and remove it."
+# legacy-memory-link:end
 
 # ── Project setup ─────────────────────────────────────────────────────────────
 if [ -f pyproject.toml ]; then
