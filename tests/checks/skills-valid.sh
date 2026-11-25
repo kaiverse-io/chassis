@@ -76,6 +76,10 @@ python3 -c 'import yaml; yaml.safe_load("description: Use when: the user asks")'
 expect_fail "a reserved leading character" "quote it" "${hdr}description: \`foo\`\n---\n\nbody\n"
 expect_fail "a boolean description" "bool, null or number" "${hdr}description: true\n---\n\nbody\n"
 expect_fail "a null description" "bool, null or number" "${hdr}description: ~\n---\n\nbody\n"
+expect_fail "a date description" "bool, null or number" "${hdr}description: 2024-01-01\n---\n\nbody\n"
+expect_fail "a sexagesimal description" "bool, null or number" "${hdr}description: 1:30\n---\n\nbody\n"
+expect_fail "a tab after the colon" "not a top-level key" "${hdr}description:\tok\n---\n\nbody\n"
+expect_fail "a duplicate key" "duplicate key" "${hdr}description: one\ndescription: two\n---\n\nbody\n"
 expect_fail "a list description" "quote it" "${hdr}description: [a, b]\n---\n\nbody\n"
 expect_fail "a name that is not the folder name" "must equal the folder name" '---\nname: other\ndescription: ok\n---\n\nbody\n'
 expect_fail "a missing description" "no usable 'description'" "${hdr}---\n\nbody\n"

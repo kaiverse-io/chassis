@@ -6,7 +6,7 @@ set -euo pipefail
 tmpdir="$1"
 pc="$tmpdir/.devcontainer/post-create.sh"
 test -f "$pc" || { echo "FAIL: stamp has no post-create.sh"; exit 1; }
-if grep -nE '^[^#]*\bln\b[^#]*\.claude/projects' "$pc"; then
+if grep -nE '^[^#]*\bln\b[^#]*(\.claude/projects|MEM_LINK)' "$pc"; then
   echo "FAIL: post-create.sh links Claude's private auto-memory into the repo"; exit 1
 fi
 agents="$tmpdir/AGENTS.md"

@@ -163,7 +163,7 @@ _ci-skills:
     def fail(path, msg):
         errors.append(f"::error file={path}::{path}: {msg}")
 
-    NON_STRING = re.compile(r"(?i)^(true|false|yes|no|on|off|y|n|null|~|[-+]?(\d[\d_]*)(\.\d*)?([eE][-+]?\d+)?|0x[0-9a-f]+|\.inf|\.nan)$")
+    NON_STRING = re.compile(r"(?i)^(true|false|yes|no|on|off|y|n|null|~|[-+]?(\d[\d_:]*)?(\.\d*)?([eE][-+]?\d+)?|0x[0-9a-f]+|0b[01_]+|0o[0-7]+|\.inf|\.nan|\d{4}-\d{2}-\d{2}.*)$")
 
     def scalar(raw):
         """Return (value, problem). value is None when there is a problem."""
@@ -218,7 +218,7 @@ _ci-skills:
             line = lines[i]
             if re.match(r"^\s*\t", line):
                 fail(f, f"frontmatter line {i + 1} is indented with a tab")
-            m = re.match(r"^([A-Za-z][A-Za-z0-9_-]*):(?:[ \t]+(.*))?$", line)
+            m = re.match(r"^([A-Za-z][A-Za-z0-9_-]*):(?: +(.*))?$", line)
             if not m:
                 if line.strip() and not line.lstrip().startswith("#"):
                     fail(f, f"frontmatter line {i + 1} is not a top-level key: value pair (multi-line plain or quoted values are not supported; use a > block)")
@@ -226,6 +226,8 @@ _ci-skills:
                 continue
             key, raw = m.group(1), (m.group(2) or "").strip()
             i += 1
+            if key in values:
+                fail(f, f"duplicate key '{key}'")
             if re.fullmatch(r"[>|][+-]?\d?\s*(#.*)?", raw):
                 block = []
                 while i < end and (not lines[i].strip() or lines[i][:1] == " "):

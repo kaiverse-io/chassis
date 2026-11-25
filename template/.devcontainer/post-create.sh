@@ -314,7 +314,8 @@ fi
 # legacy-memory-link:start
 (
   MEM_LINK="$HOME/.claude/projects/${PWD//\//-}/memory"
-  if [ -L "$MEM_LINK" ] && [ "$(readlink -f "$MEM_LINK")" = "$(readlink -f "$PWD/.agents/memory")" ]; then
+  if [ -d "$PWD/.agents/memory" ] && [ -L "$MEM_LINK" ] \
+    && [ "$(readlink -f "$MEM_LINK")" = "$(readlink -f "$PWD/.agents/memory")" ]; then
     rm -f "$MEM_LINK"
     echo "→ removed the legacy memory symlink $MEM_LINK"
     echo "[warn] review .agents/memory/ for personal notes Claude wrote through that link before you push — it is git-tracked."
