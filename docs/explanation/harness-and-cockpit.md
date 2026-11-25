@@ -1,0 +1,1 @@
+../../template/docs/explanation/harness-and-cockpit.md

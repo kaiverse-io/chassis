@@ -65,17 +65,26 @@ Docker-created directory on a fresh clone). Project-specific Claude Code setting
 *project-scoped* `.claude/settings.json` (committed, stamped by this template), which Claude Code
 already layers on top of the user-scoped one — that path was never part of the problem.
 
-## Why agent memory is git-tracked, not just bind-mounted
+## Agent memory: what is git-tracked, and what is not
 
-`.agents/memory/` (a coding agent's durable, cross-session notes) started as something the
-`~/.claude` bind mount alone was supposed to handle. That's exactly the fragile case above: fine
-on a local devcontainer, silently lost on a rebuild elsewhere. The fix was to make the *canonical*
-copy git-tracked (`.agents/memory/` in the repo itself — portable to a fresh clone, immune to any
-devcontainer or host question entirely) and have `post-create.sh` recreate a symlink at the
-conventional path (`~/.claude/projects/<project-slug>/memory`) on every build. The lesson
-generalizes: **if data needs to survive independent of the devcontainer's host, put it in git.**
-That's not always possible (session transcripts aren't meant to be committed), which is why the
-other two mechanisms exist.
+`.agents/memory/` holds project lessons an agent writes on purpose, one file per insight. It is
+git-tracked, so it is portable to a fresh clone and immune to any devcontainer or host question.
+Because it travels with the repo it is also **public if the repo is**: it is for decisions,
+gotchas and conventions, never for personal context.
+
+Claude Code's own auto-memory (`~/.claude/projects/<project-slug>/memory`) is a different thing.
+It records personal context (preferences, budgets, decisions about the operator's own work) and
+lives on the bind-mounted `~/.claude`, so it persists on a local devcontainer and is lost on a
+remote or cloud rebuild. Earlier versions of this template symlinked that path into
+`.agents/memory/` to fix the loss. That made every auto-written note a repo change, and in a
+public project a published one, which cannot be undone. The link was removed: lost auto-memory
+is recoverable (the agent relearns it, and anything worth keeping can be written to
+`.agents/memory/` deliberately); a published note is not.
+
+The lesson generalizes: **if data must survive independent of the devcontainer's host and is
+safe to publish, put it in git. If it is personal, it does not belong in the repo.** Session
+transcripts are the other case (not meant to be committed), which is why the other two
+mechanisms exist.
 
 ## Why session transcripts do NOT get their own named volume
 

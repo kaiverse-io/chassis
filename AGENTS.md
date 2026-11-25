@@ -122,36 +122,17 @@ project gets). One file per insight; `MEMORY.md` index (one line per entry).
 <!-- cockpit-section:start (kept in sync with template/AGENTS.md.jinja — see justfile ci-lint) -->
 ## AI-usage cockpit & coaching
 
-- `just metrics` (codeburn — cost/burn by project, model, task; one-shot rate) and
-  `just monitor` (abtop — live context %, tokens, rate limits) are installed by
-  `.devcontainer/post-create.sh`. Both read local session data; no OTEL required.
-- **AI Engineer Coach** (VS Code dashboard, [microsoft/ai-engineering-coach](https://github.com/microsoft/ai-engineering-coach))
-  is **opt-in** (`install_ai_coach`, default off). When enabled, `.devcontainer/post-create.sh`
-  builds it from source (pinned to a commit) — 45 anti-pattern rules, practice scores, skill
-  mining; open via Cmd/Ctrl+Shift+P → "AI Engineer Coach: Open Dashboard". Off by default
-  because it builds upstream source unattended and its **Claude Code session-log support is
-  unconfirmed** (the project documents GitHub Copilot harnesses) — if you enable it, verify
-  what it actually surfaces for this project.
-- **graphify** (`/graphify`, [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify))
-  — turns the repo into a queryable knowledge graph (`graphify-out/graph.json`/`GRAPH_REPORT.md`),
-  installed via `uv tool install graphifyy` by `.devcontainer/post-create.sh`. Check
-  `graphify-out/GRAPH_REPORT.md`'s God Nodes/communities before exploring unfamiliar code —
-  fewer tokens spent re-discovering structure the graph already answers.
-- **ctx** ([ctxrs/ctx](https://github.com/ctxrs/ctx)) — indexes full local session transcripts
-  (not just memory files) for `ctx search "…"`, so `/dev-coach` can find corrections the agent
-  actually got, not just what a past session chose to write down. Installed by
-  `.devcontainer/post-create.sh` via its own installer (prebuilt binary, no Rust toolchain).
-- OTEL telemetry is on and exports to console locally (`.claude/settings.json`) — the
-  spine for a future OTLP collector + team dashboard (bucket D, activates at users > 1).
-- `/dev-coach` — anti-pattern detection + AGENTS.md auditor, specifically for Claude Code
-  session/memory data (complements AI Engineer Coach, doesn't replace it). Also draws on `ctx`
-  (full-transcript correction search) when present. Run
-  periodically to close the loop between "the user corrected something" and "the rule is durable
-  in AGENTS.md." See `.agents/skills/dev-coach/SKILL.md`.
-- This cockpit is a chassis-level standard, not project-specific — every project stamped from
-  this chassis gets it via `post-create.sh`. See
-  [chassis's docs/explanation/ai-usage-cockpit.md](https://github.com/kaiverse-io/chassis/blob/main/docs/explanation/ai-usage-cockpit.md)
-  for the full writeup and [ADR-002](https://github.com/kaiverse-io/chassis/blob/main/docs/decisions/adrs/adr-002-ai-usage-cockpit.md).
+Detail: [docs/explanation/harness-and-cockpit.md](docs/explanation/harness-and-cockpit.md)
+(per-harness safety config for Claude Code, Codex and goose, and the cockpit tools).
+
+- The safety floor is CI and git, which apply to every harness. Per-harness config
+  (`.claude/settings.json`, `.codex/`, goose's `GOOSE_MODE`) takes effect only after a human
+  trusts the project in that harness; stamping it is necessary, never sufficient.
+- `just metrics` (cost/burn by project, model, task) and `just monitor` (live context %, tokens,
+  rate limits) are devcontainer tools. graphify and `ctx` exist only where installed; the
+  session-start hook states which are present.
+- `/dev-coach` — run periodically, or right after a corrected mistake, to turn the correction
+  into a durable AGENTS.md rule. See `.agents/skills/dev-coach/SKILL.md`.
 
 <!-- cockpit-section:end -->
 

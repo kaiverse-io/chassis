@@ -176,20 +176,21 @@ to matter). `/dev-coach` exists specifically to find the gap between them: somet
 shows really happened (a correction, a repeated mistake) that never made it into a Memory file
 — that gap is the signal worth turning into an `AGENTS.md` rule.
 
-### Tools/Skills: the same portability pattern, twice
+### Skills: a canonical copy, symlinked to the harness
 
-Chassis ships exactly one adapter pattern, applied to two different things: keep a canonical,
-harness-agnostic copy in the repo, and symlink it to wherever the *current* harness happens to
-look.
+Chassis ships one adapter pattern: keep a canonical, harness-agnostic copy in the repo, and
+symlink it to wherever the *current* harness happens to look.
 
-- **Memory**: canonical at `.agents/memory/` (git-tracked) → symlinked to
-  `~/.claude/projects/<slug>/memory` (Claude Code's own convention) by `post-create.sh`.
 - **Skills**: canonical at `.agents/skills/` (the vendor-agnostic SKILL.md open standard) →
   symlinked to `.claude/skills/` (Claude Code's own convention).
 
 If the harness changes — Claude Code today, something else later — only the thin symlink
-adapter needs to change. The canonical content, and the discipline of keeping it in git,
-doesn't move.
+adapter needs to change.
+
+**Memory is deliberately not part of this pattern.** `.agents/memory/` is git-tracked and holds
+project lessons an agent writes on purpose. Claude Code's own auto-memory
+(`~/.claude/projects/<slug>/memory`) holds personal context and is not linked to it: a link
+would turn every auto-written note into a repo change, and in a public project, a published one.
 
 ## The harness plane: what chassis will and won't put between an agent and its context
 

@@ -28,7 +28,7 @@ docs/decisions/adrs/             — MADR decision records
 .opengrep/rules/                 — custom semantic lint rules (self-weakening + prompts-as-code + project)
 .agents/skills/                  — reusable agent skills (SKILL.md open standard; .claude/skills/ symlinks here)
 .mcp.json                        — the only MCP servers agents may use here; reviewed (CODEOWNERS)
-.agents/memory/                  — agent memory, git-tracked (~/.claude/…/memory symlinks here; post-create recreates it)
+.agents/memory/                  — project lessons agents write on purpose; git-tracked, so public if the repo is
 ```
 
 ## Hard rules
@@ -87,73 +87,31 @@ adds, removes or re-wires a component.
 
 ## Agent-memory convention
 
-After a significant multi-step task, save reusable learnings to `.agents/memory/` — the
-canonical, git-tracked location (survives a devcontainer rebuild and travels with the repo).
-On Claude Code, `~/.claude/projects/<project-slug>/memory/` is a symlink `post-create.sh`
-maintains into the same files, not a separate location — write to `.agents/memory/` directly
-so the memory exists even if that symlink hasn't been (re)created yet.
+After a significant multi-step task, save reusable learnings to `.agents/memory/`. It is
+git-tracked and travels with the repo, so treat it as **public**: project lessons only
+(decisions, gotchas, conventions), never personal context, preferences, budgets or secrets.
+
+Claude Code's own auto-memory (`~/.claude/projects/<project-slug>/memory/`) is separate and
+private to the machine; it is not linked into the repo. It does not survive a remote or cloud
+container rebuild, so write anything worth keeping to `.agents/memory/` on purpose.
 
 One file per insight; `MEMORY.md` index (one line per entry). This prevents knowledge
 loss across sessions and feeds the coaching loop (Factor 2/3 of 12-factor-agents).
 
-## Harness-specific configuration
-
-This project's safety/quality floor comes from two different places: universally, in
-CI and git (Guardrails, Ratchet — run regardless of which harness or human wrote the
-commit), and per-harness, via that harness's own config — which requires a human to
-explicitly trust this project on their machine before it does anything at all:
-
-- **Claude Code**: `.claude/settings.json` (`permissions.allow`/`deny`) — active once
-  you accept the workspace-trust dialog.
-- **Codex CLI**: `.codex/config.toml` (`approval_policy`, `sandbox_mode`) and
-  `.codex/rules/default.rules` (denies `git commit --no-verify` /
-  `git push --no-verify`, best-effort — see that file's own comment for the exact
-  matching limitation) — active only once you mark this project trusted in Codex;
-  Codex skips `.codex/` entirely for untrusted projects.
-- **goose**: no project-level config file exists for goose at all (confirmed against
-  block/goose's own docs). `GOOSE_MODE=smart_approve` is instead set for every
-  process in this devcontainer via `.devcontainer/devcontainer.json`'s
-  `containerEnv` — a coarser, session-wide posture, not a per-command allow/deny
-  list. A `goose` run anywhere outside this devcontainer does not inherit it.
-
-None of the three is a substitute for the others, and none is a substitute for CI.
-Stamping a config file is necessary, never sufficient. See
-[chassis's docs/explanation/design.md](https://github.com/kaiverse-io/chassis/blob/main/docs/explanation/design.md#harness-neutrality-whats-guaranteed-vs-whats-harness-specific)
-for the full reasoning.
-
 <!-- cockpit-section:start (kept in sync with chassis's own root AGENTS.md — see justfile ci-lint) -->
 ## AI-usage cockpit & coaching
 
-- `just metrics` (codeburn — cost/burn by project, model, task; one-shot rate) and
-  `just monitor` (abtop — live context %, tokens, rate limits) are installed by
-  `.devcontainer/post-create.sh`. Both read local session data; no OTEL required.
-- **AI Engineer Coach** (VS Code dashboard, [microsoft/ai-engineering-coach](https://github.com/microsoft/ai-engineering-coach))
-  is **opt-in** (`install_ai_coach`, default off). When enabled, `.devcontainer/post-create.sh`
-  builds it from source (pinned to a commit) — 45 anti-pattern rules, practice scores, skill
-  mining; open via Cmd/Ctrl+Shift+P → "AI Engineer Coach: Open Dashboard". Off by default
-  because it builds upstream source unattended and its **Claude Code session-log support is
-  unconfirmed** (the project documents GitHub Copilot harnesses) — if you enable it, verify
-  what it actually surfaces for this project.
-- **graphify** (`/graphify`, [Graphify-Labs/graphify](https://github.com/Graphify-Labs/graphify))
-  — turns the repo into a queryable knowledge graph (`graphify-out/graph.json`/`GRAPH_REPORT.md`),
-  installed via `uv tool install graphifyy` by `.devcontainer/post-create.sh`. Check
-  `graphify-out/GRAPH_REPORT.md`'s God Nodes/communities before exploring unfamiliar code —
-  fewer tokens spent re-discovering structure the graph already answers.
-- **ctx** ([ctxrs/ctx](https://github.com/ctxrs/ctx)) — indexes full local session transcripts
-  (not just memory files) for `ctx search "…"`, so `/dev-coach` can find corrections the agent
-  actually got, not just what a past session chose to write down. Installed by
-  `.devcontainer/post-create.sh` via its own installer (prebuilt binary, no Rust toolchain).
-- OTEL telemetry is on and exports to console locally (`.claude/settings.json`) — the
-  spine for a future OTLP collector + team dashboard (bucket D, activates at users > 1).
-- `/dev-coach` — anti-pattern detection + AGENTS.md auditor, specifically for Claude Code
-  session/memory data (complements AI Engineer Coach, doesn't replace it). Also draws on `ctx`
-  (full-transcript correction search) when present. Run
-  periodically to close the loop between "the user corrected something" and "the rule is durable
-  in AGENTS.md." See `.agents/skills/dev-coach/SKILL.md`.
-- This cockpit is a chassis-level standard, not project-specific — every project stamped from
-  this chassis gets it via `post-create.sh`. See
-  [chassis's docs/explanation/ai-usage-cockpit.md](https://github.com/kaiverse-io/chassis/blob/main/docs/explanation/ai-usage-cockpit.md)
-  for the full writeup and [ADR-002](https://github.com/kaiverse-io/chassis/blob/main/docs/decisions/adrs/adr-002-ai-usage-cockpit.md).
+Detail: [docs/explanation/harness-and-cockpit.md](docs/explanation/harness-and-cockpit.md)
+(per-harness safety config for Claude Code, Codex and goose, and the cockpit tools).
+
+- The safety floor is CI and git, which apply to every harness. Per-harness config
+  (`.claude/settings.json`, `.codex/`, goose's `GOOSE_MODE`) takes effect only after a human
+  trusts the project in that harness; stamping it is necessary, never sufficient.
+- `just metrics` (cost/burn by project, model, task) and `just monitor` (live context %, tokens,
+  rate limits) are devcontainer tools. graphify and `ctx` exist only where installed; the
+  session-start hook states which are present.
+- `/dev-coach` — run periodically, or right after a corrected mistake, to turn the correction
+  into a durable AGENTS.md rule. See `.agents/skills/dev-coach/SKILL.md`.
 
 <!-- cockpit-section:end -->
 

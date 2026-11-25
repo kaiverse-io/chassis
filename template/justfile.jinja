@@ -29,6 +29,7 @@ ci-lint:
     @just _ci-file-size
     @just _ci-gate-integrity
     @just _ci-agents-size
+    @just _ci-skills
 
 ci-test:
     uv run pytest
@@ -140,6 +141,95 @@ _ci-agents-size:
     if n > limit:
         print(f"::error file=AGENTS.md::AGENTS.md has {n} lines (limit {limit}) — move detail into docs/ and link it", file=sys.stderr)
         sys.exit(1)
+
+# Every skill under .agents/skills/ must be a valid SKILL.md for strict harnesses: a frontmatter
+# block with `name` (the folder name; lowercase and hyphens, at most 64 characters) and
+# `description` (non-empty, at most 1024 characters), values that a strict YAML parser accepts
+# (an unquoted ": " inside a plain value does not parse), a body of at most 500 lines (the
+# description is always in context; the body loads when the skill runs), and no .mcp.json inside
+# a skill (MCP servers are added in one reviewed place, the root .mcp.json). Claude Code tolerates
+# a missing block; others refuse the skill. Self-contained: no YAML library needed.
+[private]
+_ci-skills:
+    #!/usr/bin/env python3
+    import json, pathlib, re, sys
+    max_body, max_name, max_desc = 500, 64, 1024
+    errors = []
+
+    def fail(path, msg):
+        errors.append(f"::error file={path}::{path}: {msg}")
+
+    def scalar(raw):
+        raw = raw.strip()
+        if raw[:1] == '"':
+            try:
+                return json.loads(raw)
+            except ValueError:
+                return None
+        if raw[:1] == "'":
+            return raw[1:-1].replace("''", "'") if raw.endswith("'") and len(raw) > 1 else None
+        if ": " in raw or raw.endswith(":"):
+            return None  # a plain scalar cannot contain ": "
+        return raw
+
+    root = pathlib.Path(".agents/skills")
+    skills = sorted(p for p in root.iterdir() if p.is_dir()) if root.is_dir() else []
+    for skill in skills:
+        f = skill / "SKILL.md"
+        if not f.is_file():
+            fail(skill, "no SKILL.md")
+            continue
+        for stray in skill.rglob(".mcp.json"):
+            fail(stray, "a skill must not carry its own .mcp.json; add MCP servers in the root .mcp.json")
+        lines = f.read_text(errors="replace").splitlines()
+        if not lines or lines[0].strip() != "---":
+            fail(f, "no frontmatter block (the file must open with ---, then name and description)")
+            continue
+        end = next((i for i in range(1, len(lines)) if lines[i].strip() == "---"), None)
+        if end is None:
+            fail(f, "frontmatter block is not closed with ---")
+            continue
+        if len(lines) - end - 1 > max_body:
+            fail(f, f"body is {len(lines) - end - 1} lines (limit {max_body}); move detail into a sibling file and link it")
+        values, i = {}, 1
+        while i < end:
+            line = lines[i]
+            m = re.match(r"^([A-Za-z][A-Za-z0-9_-]*):(?:[ \t]+(.*))?$", line)
+            if not m:
+                if line.strip() and not line[:1].isspace():
+                    fail(f, f"frontmatter line {i + 1} is not a key: value pair")
+                i += 1
+                continue
+            key, raw = m.group(1), (m.group(2) or "").strip()
+            i += 1
+            if raw[:1] in (">", "|"):
+                block = []
+                while i < end and (not lines[i].strip() or lines[i][:1].isspace()):
+                    block.append(lines[i].strip())
+                    i += 1
+                values[key] = " ".join(x for x in block if x)
+            elif raw == "":
+                while i < end and (not lines[i].strip() or lines[i][:1].isspace()):
+                    i += 1
+                values[key] = None  # nested mapping or list: not a scalar
+            else:
+                value = scalar(raw)
+                if value is None:
+                    fail(f, f"'{key}' is not valid YAML as written; quote the value (a plain value cannot contain ': ')")
+                values[key] = value
+        name, desc = values.get("name"), values.get("description")
+        if not isinstance(name, str) or not name:
+            fail(f, "frontmatter has no 'name'")
+        elif name != skill.name:
+            fail(f, f"name '{name}' must equal the folder name '{skill.name}'")
+        elif not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", name) or len(name) > max_name:
+            fail(f, f"name '{name}' must be lowercase letters, digits and hyphens, at most {max_name} characters")
+        if not isinstance(desc, str) or not desc.strip():
+            fail(f, "frontmatter has no 'description'")
+        elif len(desc) > max_desc:
+            fail(f, f"description is {len(desc)} characters (limit {max_desc})")
+    print("\n".join(errors), file=sys.stderr) if errors else print(f"{len(skills)} skills checked.")
+    sys.exit(1 if errors else 0)
 
 # The checks an agent runs locally and the checks CI runs must be the same list. Fails when
 # .github/workflows/ci.yaml runs a `just` step that `ci` does not list, or skips one it does.
