@@ -95,6 +95,11 @@ Claude Code's own auto-memory (`~/.claude/projects/<project-slug>/memory/`) is s
 private to the machine; it is not linked into the repo. It does not survive a remote or cloud
 container rebuild, so write anything worth keeping to `.agents/memory/` on purpose.
 
+When you hit friction (a command that needed a retry, a doc or skill step that was wrong, a
+gotcha), append an entry to `.agents/memory/papercuts.md`: what you tried, what you expected,
+what happened, a suggested fix, and the file or skill involved. Describe the project, never the
+operator. `/dev-coach` reads it and clears the entries it has acted on.
+
 One file per insight; `MEMORY.md` index (one line per entry). This prevents knowledge
 loss across sessions and feeds the coaching loop (Factor 2/3 of 12-factor-agents).
 

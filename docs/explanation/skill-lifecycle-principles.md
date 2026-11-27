@@ -45,10 +45,10 @@ The Gita (18.14) names five factors in any action: the **seat** (*adhishthana*),
 (*daiva*). Verse 18.18 adds that the whole of an action is instrument, act and doer. That
 gives a complete, non-coding-specific list of what a work system has to account for.
 
-| Attribute | Vedic anchor | Principle | Where it lives (chassis / agnova) |
+| Attribute | Vedic anchor | Principle | Where it lives (chassis / a stamped runtime) |
 |---|---|---|---|
-| **Seat**: what the work stands on | *adhishthana* (Gita 18.14) | The substrate is part of the work. Reproducible, versioned, inspectable, or the work is not. | Git, devcontainer, `justfile`, pinned tools. Agent home repos in agnova. |
-| **Doer**: who acts | *karta*, *svadharma* (Gita 3.35) | Each actor has a role with its own duty. A role does its own work, not another's, even if it could. | Per-harness config; agent persona and `PRINCIPLES.md` in agnova homes. |
+| **Seat**: what the work stands on | *adhishthana* (Gita 18.14) | The substrate is part of the work. Reproducible, versioned, inspectable, or the work is not. | Git, devcontainer, `justfile`, pinned tools. Agent home repos in a runtime. |
+| **Doer**: who acts | *karta*, *svadharma* (Gita 3.35) | Each actor has a role with its own duty. A role does its own work, not another's, even if it could. | Per-harness config; agent persona and principles file in agent homes. |
 | **Instruments**: what is used | *karana* (Gita 18.14) | Instruments are chosen for the task and are distinct from the doer. Skills, tools and hooks are instruments, not identity. | `.agents/skills/`, hooks, `just` recipes. |
 | **Effort**: the method | *cheshta*, *abhyasa* (YS 1.12-1.14) | Repeatable practice beats heroics. The method is a loop that can be run again. | The lifecycle in section 6. |
 | **The unseen**: what is not in your control | *daiva* (Gita 18.14) | Design for variance you cannot control: model changes, upstream changes, flaky infrastructure. Pin, measure, retry honestly. | Pinned versions, evals, no silent rewriters (ADR-004). |
@@ -258,13 +258,13 @@ contents and reports the result. It does not act on it. It reports.
 **The principles do not adapt in this loop.** If observation shows a principle is wrong, that is
 a level 4 matter: a human writes an ADR. The only things the loop may weaken are practices.
 
-## 11. Mapping to chassis and agnova
+## 11. Mapping to chassis and the projects it stamps
 
 | Plane | Holds | Role |
 |---|---|---|
 | **Chassis template** | Principles (this doc), gates, skill scaffold, `dev-coach`, ADRs | Owns the invariants and the gates every project inherits. |
-| **A stamped project** (e.g. agnova itself) | Its own skills and rules, its run and friction logs | Where practices are proven on real work. |
-| **Agnova-scaffolded agent homes** | Runtime skills, memory, knowledge, daily notes | Where agents run unattended: the closest match to the system this describes, and so the place the same checks matter most. |
+| **A stamped project** (for example a runtime that runs agents) | Its own skills and rules, its run and friction logs | Where practices are proven on real work. |
+| **Agent homes scaffolded by a runtime** | Runtime skills, memory, knowledge, daily notes | Where agents run unattended: the closest match to the system this describes, and so the place the same checks matter most. |
 
 The existing pieces already realise much of this: chassis buckets A-D are section 7; ADR-011
 is the nishiddha and ahimsa layer; ADR-004 is the exclusion of interceptors; `dev-coach` is
@@ -279,8 +279,8 @@ is the nishiddha and ahimsa layer; ADR-004 is the exclusion of interceptors; `de
 4. A run log, after a spike on whether a hook can see skill invocations.
 5. `dev-coach`: the prune step (needs 4) and the guna-rubric report.
 6. Ablation evals for one skill (needs real prompts to replay).
-7. In agnova: the same checks for agent homes (agnova#20), then a curator for agent homes, after
-   the message round trip in agnova#2 is verified.
+7. In a runtime that scaffolds agent homes: the same checks for those homes, then a curator for
+   them, once that runtime's message round trip is verified.
 
 ## 13. Limits of this framing
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Codex is one of the two other harnesses agnova switches between interchangeably
+# Codex is one of the two other harnesses a stamped project can switch between interchangeably
 # (goose is the other — see goose-mode-configured.sh). Governance's live enforcement
 # was Claude-Code-only until these files existed (design.md's "Harness neutrality").
 set -euo pipefail

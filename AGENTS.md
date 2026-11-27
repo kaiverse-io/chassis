@@ -119,6 +119,11 @@ After a significant multi-step task, save reusable learnings to `.agents/memory/
 survives devcontainer rebuilds and is portable to a fresh clone, same convention every stamped
 project gets). One file per insight; `MEMORY.md` index (one line per entry).
 
+When you hit friction (a command that needed a retry, a doc or skill step that was wrong, a
+gotcha), append an entry to `.agents/memory/papercuts.md`: what you tried, what you expected,
+what happened, a suggested fix, and the file or skill involved. Describe the project, never the
+operator. `/dev-coach` reads it and clears the entries it has acted on.
+
 <!-- cockpit-section:start (kept in sync with template/AGENTS.md.jinja — see justfile ci-lint) -->
 ## AI-usage cockpit & coaching
 

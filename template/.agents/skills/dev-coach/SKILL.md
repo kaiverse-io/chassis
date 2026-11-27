@@ -49,6 +49,14 @@ skills — then asks before writing anything. It never edits silently.
    everything that was actually said. Treat a hit here with no corresponding memory file as a
    gap in step 2, not just a gap in AGENTS.md.
 
+2b. **Read the friction log.** If `.agents/memory/papercuts.md` has entries, group them by the
+   file, command or skill involved. An entry that repeats, or that an automated check could have
+   caught, is a candidate: a mechanical failure becomes a deterministic check (a lint rule, a
+   pre-commit hook, a CI step), a judgement call becomes an AGENTS.md rule, and a wrong skill step
+   becomes a skill fix. Quote the evidence (the entries) in each proposal. Once the user approves
+   and you have acted, remove those entries from the file; leave the rest. The log is public if
+   the repo is, so propose general rules and never copy personal context into the repo.
+
 3. **Scan recent git history for rework signal.** `git log --oneline -30`. Look for patterns:
    consecutive commits touching the same file with messages like "fix", "typo", "revert", "oops" —
    this is a proxy for low one-shot rate when transcript data isn't available.
