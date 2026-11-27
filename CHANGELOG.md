@@ -9,6 +9,22 @@ changed, tersely. Anything longer is in git history or an ADR.
 
 ---
 
+## [0.17.0](https://github.com/kaiverse-io/chassis/compare/v0.16.0...v0.17.0) (2026-11-27)
+
+
+### Features
+
+* friction log for /dev-coach, and CODEOWNERS review for skills ([3c2461e](https://github.com/kaiverse-io/chassis/commit/3c2461e16b28744949e1cacfdcecffe31083da18)), closes [#22](https://github.com/kaiverse-io/chassis/issues/22) [#23](https://github.com/kaiverse-io/chassis/issues/23)
+* friction log for /dev-coach, CODEOWNERS for skills, and remove consuming-project names ([16f3d06](https://github.com/kaiverse-io/chassis/commit/16f3d06c6ac77b9c6fe605050d2fe4fe4e5f5371))
+
+
+### Bug Fixes
+
+* close remaining review gaps in the skills check and legacy-link cleanup ([b33dd3c](https://github.com/kaiverse-io/chassis/commit/b33dd3cde46d2acfe42bf7142caae9f055d10c71))
+* stricter skills check, remove legacy memory link, hook points at the new doc ([2440c6e](https://github.com/kaiverse-io/chassis/commit/2440c6e6570617c8ee3e7a2a0bc604e7dfe1c14b))
+* valid skill frontmatter, truthful session hook, no private-memory link, slimmer AGENTS.md ([aaee982](https://github.com/kaiverse-io/chassis/commit/aaee9821709049df73e1fdfdf333b47a459743c1))
+* valid skill frontmatter, truthful session hook, no private-memory link, slimmer AGENTS.md ([cb9dedd](https://github.com/kaiverse-io/chassis/commit/cb9dedd746639076ccf7243353f03151bfd3e6a5)), closes [#20](https://github.com/kaiverse-io/chassis/issues/20) [#21](https://github.com/kaiverse-io/chassis/issues/21)
+
 ## [0.16.0](https://github.com/kaiverse-io/chassis/compare/v0.15.0...v0.16.0) (2026-11-07)
 
 
