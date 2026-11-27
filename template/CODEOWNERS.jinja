@@ -20,3 +20,6 @@ pyproject.toml            @{{ github_owner }}
 .codex/                   @{{ github_owner }}
 .mcp.json                 @{{ github_owner }}
 AGENTS.md                 @{{ github_owner }}
+# Skills are steering files too: an agent that can rewrite its own skills unreviewed can change
+# what it does. .agents/memory/ is deliberately not listed; agents write there routinely.
+.agents/skills/           @{{ github_owner }}
