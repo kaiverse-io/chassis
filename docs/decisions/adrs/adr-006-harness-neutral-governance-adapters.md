@@ -12,15 +12,15 @@ last_reviewed: 2026-08-09
 
 ## Context
 
-Governance's only live mechanism was `.claude/settings.json` — Claude Code specific. A sibling
-project, agnova, switches between three interchangeable agent adapters on the same repo —
+Governance's only live mechanism was `.claude/settings.json` — Claude Code specific. A project
+stamped from chassis can switch between three interchangeable agent adapters on the same repo —
 `claude-agent-acp`, `goose`, and `codex-acp` — so a Claude-only Governance layer left two-thirds
 of chassis's real usage with no enforcement at all, only `AGENTS.md`'s prose (which those two
 harnesses do read natively, per the open standard, but obeying it is up to them).
 
 ## Decision drivers
 
-- agnova switches harnesses per agent, on the same repo — not per project, not at stamp time.
+- A project can switch harnesses per agent, on the same repo — not per project, not at stamp time.
 - Each harness's own config mechanism is a fixed fact, not a chassis design choice — the design
   has to fit what Codex CLI and goose actually support, not what would be convenient.
 - "Thin by discipline": any addition still has to fit `just accept`'s ~2-minute forcing
@@ -68,7 +68,7 @@ linked from.
 ## Consequences
 
 **Good:** a project stamped from chassis now has a real, if imperfect, Governance posture no
-matter which of the three harnesses agnova (or any other multi-harness setup) points at it, with
+matter which of the three harnesses any multi-harness setup points at it, with
 zero stamp-time decision required and zero runtime cost for a harness that's never installed.
 
 **Bad / risks:** the three adapters are not equivalent in strength — Claude Code's and Codex's

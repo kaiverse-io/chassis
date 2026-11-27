@@ -95,5 +95,5 @@ engineering reasons. The `owner` / `last_reviewed` / state metadata is a new con
 - Run-log spike: can a hook see skill invocations; if not, `dev-coach` scans transcripts.
 - `dev-coach`: prune step (needs the run log) and the quality-rubric report.
 - Ablation evals for one skill, as the first real use of the eval slot.
-- Agnova (runtime plane): the same checks for scaffolded agent homes, then a curator for them,
-  after the message round trip in agnova#2 is verified.
+- Runtime plane: the same checks for agent homes scaffolded by a runtime built on a stamp, then a
+  curator for them, once that runtime's message round trip is verified.
